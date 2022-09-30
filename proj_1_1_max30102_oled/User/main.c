@@ -32,20 +32,20 @@ int main(void)
 	MAX30102_Reset();	
 	MAX30102_Config();
 	// 模块初始化-END
-
-	/*
+	OLED_Printf_EN(0, 0, "   *Oximeter*");
+	
 	for (i = 0; i < 128; i++) {
 		while (MAX30102_INTPin_Read() == 0) {
 			// 读取FIFO
 			MAX30102_Read_Fifo();
 		}
 	}
-*/
+
 	
 	while(1) {
-		//DS18B20_Deal_Temp();
-		//BLOOD_Loop();
-		OLED_Printf_EN(2, 0, "heart:%3d/min  ", 60);
+		// DS18B20_Deal_Temp();
+		BLOOD_Loop();
+		//OLED_Printf_EN(2, 0, "heart:%3d/min  ", 60);
 	}
 }
 

@@ -89,7 +89,7 @@ void BLOOD_Data_Translate(void)
 			n_denom= ( s2[i].real+s2[i+1].real+ s2[i+2].real+ s2[i+3].real+ s2[i+4].real+ s2[i+5].real+ s2[i+6].real+ s2[i+7].real);
 			s2[i].real=  n_denom/8.00; 
 		
-			printf("%f\r\n",s1[i].real);		
+			printf("%f\r\n",s1[i].real);
 	}
 	printf("************8 pt Moving Average ir*************************************************************\r\n");
 	for (i = 0;i < FFT_N;i++) {
@@ -136,8 +136,7 @@ void BLOOD_Data_Translate(void)
 	printf("%d\r\n",s1_max_index);
 	printf("%d\r\n",s2_max_index);
 	//检查HbO2和Hb的变化频率是否一致
-//	if(i>=45)
-//	{
+//	if (i>=45) {
 		//心率计算
 //		uint16_t Heart_Rate = 60.00 * SAMPLES_PER_SECOND * 
 //													s1_max_index / FFT_N;
@@ -177,7 +176,7 @@ void BLOOD_Data_Translate(void)
 
 void BLOOD_Loop(void)
 {
-	//血液信息获取
+	// 血液检测信息更新
 	BLOOD_Data_Update();
 	//血液信息转换
 	BLOOD_Data_Translate();

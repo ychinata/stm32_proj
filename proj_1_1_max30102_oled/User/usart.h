@@ -2,11 +2,14 @@
 #define _USART_H
 #include "stm32f10x.h"                  // Device header
 #include <stdio.h>
+
+// ≈‰÷√USART-BGN
 #define USART1_PORT 1
 #define USART2_PORT 0
 #define USART3_PORT 0
 #define UART4_PORT 	0
 #define UART5_PORT 	0
+// ≈‰÷√USART-END
 
 #if	USART1_PORT
 #define USART_TX_CLK 							RCC_APB2Periph_GPIOA

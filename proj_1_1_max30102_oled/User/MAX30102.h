@@ -32,7 +32,7 @@
 #define MAX30102_INTPin_CLK 						RCC_APB2Periph_GPIOB
 #define MAX30102_INTPin_PORT 						GPIOB
 #define MAX30102_INTPin_Pin 						GPIO_Pin_9
-// MAX3010X ÖÐ¶Ï×´Ì¬¶ÁÈ¡
+// MAX3010X ÖÐ¶Ï×´Ì¬¶ÁÈ¡£¬¶ÁINT¹Ü½Å
 #define MAX30102_INTPin_Read() 					GPIO_ReadInputDataBit(MAX30102_INTPin_PORT, MAX30102_INTPin_Pin)
 
 #define Led_CLK 						RCC_APB2Periph_GPIOC
