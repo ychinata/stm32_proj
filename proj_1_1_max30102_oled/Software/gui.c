@@ -779,3 +779,31 @@ void Gui_Drawbmp16(u16 x,u16 y,const unsigned char *p) //显示40*40 QQ图片
 	}	
 	LCD_SetWindows(0,0,lcddev.width-1,lcddev.height-1);//恢复显示窗口为全屏	
 }
+
+
+// 2022.9.30
+void GUI_DrawTestPage(u8 *str)
+{
+	//绘制固定栏up
+	LCD_Clear(WHITE);
+	LCD_Fill(0,0,lcddev.width,20,BLUE);
+	//绘制固定栏down
+	LCD_Fill(0,lcddev.height-20,lcddev.width,lcddev.height,BLUE);
+	POINT_COLOR=WHITE;
+	Gui_StrCenter(0,2,WHITE,BLUE,str,16,1);//居中显示
+	Gui_StrCenter(0,lcddev.height-18,WHITE,BLUE,"www.ftf.com",16,1);//居中显示
+	//绘制测试区域
+	//LCD_Fill(0,20,lcddev.width,lcddev.height-20,WHITE);
+}
+
+// 2022.9.30
+void GUI_MainTest(void)
+{
+	GUI_DrawTestPage("综合测试程序");	
+	Gui_StrCenter(0,23,RED,BLUE,"电子",16,1);			//居中显示,中文需要取模之后才能显示?
+	Gui_StrCenter(0,40,RED,BLUE,"Helloworld程序",16,1);	//居中显示	
+	Gui_StrCenter(0,57,GREEN,BLUE,"1.8\" ST7735S",16,1);//居中显示
+	Gui_StrCenter(0,74,GREEN,BLUE,"128x160",16,1);		//居中显示
+	Gui_StrCenter(0,91,BLUE,BLUE,"2022-09-30",16,1);	//居中显示
+	delay_ms(1000);		// 每1秒刷新一次, 原来是3秒
+}
