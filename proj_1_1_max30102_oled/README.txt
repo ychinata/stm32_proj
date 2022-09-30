@@ -18,5 +18,9 @@ INT:B9
 
 TFT屏幕显示？用HAL库？
 
+TFT-LCD模块关联文件：
+lcd.c, spi.c, gui.c
+
+
 
 
