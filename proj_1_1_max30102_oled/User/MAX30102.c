@@ -1,7 +1,7 @@
 #include "MAX30102.h"
 #include "systick.h"
-uint16_t fifo_red;
-uint16_t fifo_ir;
+uint16_t g_fifoRed;
+uint16_t g_fifoIr;
 	
 void MAX30102_GPIO(void)
 {	
@@ -40,8 +40,8 @@ void MAX30102_Config(void)
 void MAX30102_Read_Fifo(void)
 {
 	uint16_t un_temp;
-	fifo_red = 0;
-	fifo_ir = 0;
+	g_fifoRed = 0;
+	g_fifoIr = 0;
 	uint8_t ach_i2c_data[6];
 
 	//read and clear status register
@@ -52,32 +52,35 @@ void MAX30102_Read_Fifo(void)
 
 	IIC_Read_Array(MAX30102_Device_address, REG_FIFO_DATA,ach_i2c_data,6);
 
-	un_temp=ach_i2c_data[0];
-	un_temp<<=14;
-	fifo_red+=un_temp;
-	un_temp=ach_i2c_data[1];
-	un_temp<<=6;
-	fifo_red+=un_temp;
-	un_temp=ach_i2c_data[2];
-	un_temp>>=2;
-	fifo_red+=un_temp;
+	// ach_i2c_data[0-2]组装g_fifoRed
+	un_temp = ach_i2c_data[0];
+	un_temp <<= 14;
+	g_fifoRed += un_temp;
+	un_temp = ach_i2c_data[1];
+	un_temp <<= 6;
+	g_fifoRed += un_temp;
+	un_temp = ach_i2c_data[2];
+	un_temp >>= 2;
+	g_fifoRed+=un_temp;
+	if (g_fifoRed <= 10000) {
+		g_fifoRed = 0;
+	}	
 
-	un_temp=ach_i2c_data[3];
-	un_temp<<=14;
-	fifo_ir+=un_temp;
-	un_temp=ach_i2c_data[4];
-	un_temp<<=6;
-	fifo_ir+=un_temp;
-	un_temp=ach_i2c_data[5];
-	un_temp>>=2;
-	fifo_ir+=un_temp;
+	// ach_i2c_data[3-5]组装g_fifoIr
+	un_temp = ach_i2c_data[3];
+	un_temp <<= 14;
+	g_fifoIr += un_temp;
+	un_temp = ach_i2c_data[4];
+	un_temp <<= 6;
+	g_fifoIr += un_temp;
+	un_temp = ach_i2c_data[5];
+	un_temp >>= 2;
+	g_fifoIr += un_temp;
 	
-	if (fifo_ir<=10000) {
-		fifo_ir=0;
+	if (g_fifoIr< = 10000) {
+		g_fifoIr = 0;
 	}
-	if (fifo_red<=10000) {
-		fifo_red=0;
-	}
+
 }
 
 

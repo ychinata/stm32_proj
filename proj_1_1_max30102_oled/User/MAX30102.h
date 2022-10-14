@@ -41,8 +41,8 @@
 
 #define SAMPLES_PER_SECOND 					100	//¼ì²âÆµÂÊ
 
-extern uint16_t fifo_red;
-extern uint16_t fifo_ir;
+extern uint16_t g_fifoRed;
+extern uint16_t g_fifoIr;
 
 void MAX30102_GPIO(void);
 uint8_t MAX30102_Reset(void);

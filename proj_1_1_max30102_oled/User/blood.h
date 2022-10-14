@@ -5,18 +5,17 @@
 #include "algorithm.h"
 #include "math.h"
 #include "OLED_IIC.h"
-typedef enum
-{
+
+typedef enum {
 	BLD_NORMAL,		//正常
 	BLD_ERROR,		//侦测错误
 	
-}BloodState;//血液状态
+} BloodState;//血液状态
 
-typedef struct
-{
+typedef struct {
 	int 		heart;		//心率数据
 	float 			SpO2;			//血氧数据
-}BloodData;
+} BloodData;
 
 
 void BLOOD_Data_Translate(void);

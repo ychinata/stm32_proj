@@ -29,9 +29,9 @@ void BLOOD_Data_Update(void)
 			//将数据写入fft输入并清除输出
 			if (g_fft_index < FFT_N) {
 				//将数据写入fft输入并清除输出
-				s1[g_fft_index].real = fifo_red;
+				s1[g_fft_index].real = g_fifoRed;
 				s1[g_fft_index].imag= 0;
-				s2[g_fft_index].real = fifo_ir;
+				s2[g_fft_index].real = g_fifoIr;
 				s2[g_fft_index].imag= 0;
 				g_fft_index++;
 			}
@@ -39,7 +39,9 @@ void BLOOD_Data_Update(void)
 	}
 }
 
-//血液信息转换
+// 血液信息转换：直流滤波-移动平均滤波-八点平均滤波-FFT变换-寻找峰值
+// 从原始数据中解算出血氧和心率值
+// 输出变量：g_blooddata, 包括血氧和心率值
 void BLOOD_Data_Translate(void)
 {	
 	float n_denom;
@@ -135,17 +137,16 @@ void BLOOD_Data_Translate(void)
 	int s2_max_index = find_max_num_index(s2, 30);
 	printf("%d\r\n",s1_max_index);
 	printf("%d\r\n",s2_max_index);
+	
 	//检查HbO2和Hb的变化频率是否一致
 //	if (i>=45) {
-		//心率计算
+		/*** 心率计算 ***/
 //		uint16_t Heart_Rate = 60.00 * SAMPLES_PER_SECOND * 
-//													s1_max_index / FFT_N;
+//													s1_max_index / FFT_N;	
+		float heartRate = 60.00 * ((100.0 * s1_max_index )/ 512.00);		
+		g_blooddata.heart = heartRate;
 		
-		float Heart_Rate = 60.00 * ((100.0 * s1_max_index )/ 512.00);
-		
-		g_blooddata.heart = Heart_Rate;
-		
-		//血氧含量计算
+		/*** 血氧含量计算 ***/
 		//double R = (s2[average].real * s1[0].real)/(s1[s1_max_index].real * s2[0].real);		
 		//sp02_num = (1 - sp02_num) * SAMPLES_PER_SECOND + CORRECTED_VALUE;
 		
@@ -160,7 +161,7 @@ void BLOOD_Data_Translate(void)
 		//( n_y_ac *n_x_dc_max) / ( n_x_ac *n_y_dc_max)
 			
 		float R = (ac_ir*dc_red)/(ac_red*dc_ir);
-		float sp02_num =-45.060*R*R+ 30.354 *R + 94.845;
+		float sp02_num = -45.060*R*R + 30.354*R + 94.845;
 		g_blooddata.SpO2 = sp02_num;
 			
 		//状态正常
@@ -178,16 +179,16 @@ void BLOOD_Loop(void)
 {
 	// 血液检测信息更新
 	BLOOD_Data_Update();
-	//血液信息转换
+	// 计算血氧和心率
 	BLOOD_Data_Translate();
 
 	//显示血液状态信息
-	OLED_Printf_EN(2,0,"heart:%3d/min  ",g_blooddata.heart);
-	g_blooddata.SpO2 = (g_blooddata.SpO2 > 99.99) ? 99.99:g_blooddata.SpO2;
-	OLED_Printf_EN(4,0,"SpO2:%2.2f%%  ",g_blooddata.SpO2);
-	printf("指令心率%3d",g_blooddata.heart);
+	OLED_Printf_EN(2,0,"heart:%3d/min  ", g_blooddata.heart);
+	g_blooddata.SpO2 = (g_blooddata.SpO2 > 99.99) ? 99.99 : g_blooddata.SpO2;
+	OLED_Printf_EN(4,0,"SpO2:%2.2f%%  ", g_blooddata.SpO2);
+	printf("指令心率%3d", g_blooddata.heart);
 	Delay_ms(10);
-	printf("指令血氧%0.2f",g_blooddata.SpO2);
+	printf("指令血氧%0.2f", g_blooddata.SpO2);
 	//tft显示刷新
 	//LED 蜂鸣器信息更新
 }
