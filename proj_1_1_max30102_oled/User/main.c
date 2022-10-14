@@ -27,18 +27,19 @@ int main(void)
 	InitAllDriver();
 	
 	OLED_Printf_EN(0, 0, "   *Oximeter*");
+	Gui_StrCenter(0,91,BLUE,BLUE,"2022-09-30",16,1);
+	// 为什么要执行128次? 执行完TFT屏就亮不了
 //	for (i = 0; i < 128; i++) {
 //		while (MAX30102_INTPin_Read() == 0) {
 //			// 读取FIFO
 //			MAX30102_Read_Fifo();
 //		}
 //	}
-	
+//	
 	while(1) {
-		// DS18B20_Deal_Temp();
-		//BLOOD_Loop();
-		GUI_MainTest();
-		//OLED_Printf_EN(2, 0, "heart:%3d/min  ", 60);
+		//GUI_MainTest();
+		BLOOD_Loop();		
+		OLED_Printf_EN(2, 0, "heart:%3d/min  ", 60);
 	}
 }
 
