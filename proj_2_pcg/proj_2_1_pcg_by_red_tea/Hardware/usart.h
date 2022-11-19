@@ -37,6 +37,7 @@ __align(4) typedef struct {
 	
 		QueueInfo *UART_Queue;//队列缓冲区指针
 }_UART_Info;
+
 extern  _UART_Info *UART_Info ; //上传数据结构
 //////////////////////////////////////////////////////////////////////////		
 extern u8 USART_RX_BUF[USART_REC_LEN] ;   //接收缓冲                         
