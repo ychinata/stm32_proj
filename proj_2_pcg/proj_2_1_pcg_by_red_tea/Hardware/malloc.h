@@ -40,10 +40,12 @@
 #ifndef NULL
 #define NULL 0
 #endif
+
 //定义内存池
 #define SRAMIN			0	//内部内存池
 //#define SRAMCCM  		1	//CCM内存池(此部分SRAM仅仅CPU可以访问!!!)
 //#define SRAMEX  		2	//外部内存池
+
 //////////////////////////////////////////////////////////////////////////////////////////////// 
 //内存管理控制器
 struct _m_mallco_dev

@@ -46,14 +46,15 @@ int main(void)
     LED_IO_Init();		
     KEY_IO_Init();
     HCO5_GPIO_Init();
-    //ESP8266_IO_Init();
     uart1_init(460800);//串口初始化
-    Main_printf("开机\r\n");	
+    Main_printf("开机\r\n");
     Main_printf("STM32F103C8 V5.1.2 单通道心音采集  配套硬件 V2.1.5 2022-07-26\r\n");	
 ////////////////////////////////////////////////////////////////////////////////
-    LED1=LED_ON;	LED2=LED_ON;
+    LED1 = LED_ON;	
+    LED2 = LED_ON;
     delay_ms(1000);		
-    LED1=LED_OFF;LED2=LED_OFF;
+    LED1 = LED_OFF;
+    LED2 = LED_OFF;
 ////////////////////////////////////////////////////////////////////////////////
 //		//初始化系统时钟	 8M		
 //		__disable_irq();//关总中断
@@ -76,18 +77,18 @@ int main(void)
     ADC_DMA_Config(ADCConvertedValue,3);
     Main_printf("DMA ADC 初始化完成\r\n");		
 ///////////////////////////////////////////////////////////////////////////
-    UART_Info = (_UART_Info*)mymalloc(SRAMIN,sizeof(_UART_Info)); //队列结构
-    UART_Info->UART_Queue =  queue_init(UART_QUEUE_SIZE,UART_QUEUE_LENGTH) ;//循环队列初始化
-    UART_Info->sendbuf = (u8*)mymalloc(SRAMIN,UART_SEND_LENGTH);	//发送缓冲区 
-    if(UART_Info== NULL|| UART_Info->UART_Queue == NULL ||UART_Info->sendbuf == NULL ) {
+    UART_Info = (_UART_Info*)mymalloc(SRAMIN, sizeof(_UART_Info)); //队列结构
+    UART_Info->UART_Queue =  queue_init(UART_QUEUE_SIZE, UART_QUEUE_LENGTH) ;//循环队列初始化
+    UART_Info->sendbuf = (u8*)mymalloc(SRAMIN, UART_SEND_LENGTH);	//发送缓冲区 
+    if(UART_Info == NULL || UART_Info->UART_Queue == NULL || UART_Info->sendbuf == NULL ) {
         Main_printf("串口缓存,内存申请失败\r\n");
     } else {
         Main_printf("串口缓存,内存申请成功\r\n");
     }
-    Main_printf("内存当前占用 %d\r\n",mem_perused(SRAMIN));	
+    Main_printf("内存当前占用 %d\r\n", mem_perused(SRAMIN));
 ///////////////////////////////////////////////////////////////////////////				
     while(1) {
-            Send_BlueTooth();
+        Send_BlueTooth();
     }
 }	
 	
@@ -95,7 +96,8 @@ int main(void)
 void Send_BlueTooth(void)
 {
     u16 i,j,z,res;
-    u8 addcheck=0,sumcheck=0;	
+    u8 addcheck=0;
+    u8 sumcheck=0;	
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     Main_printf("蓝牙发送\r\n");
     Main_printf("内存当前占用 %d\r\n",mem_perused(SRAMIN));	
@@ -105,7 +107,7 @@ void Send_BlueTooth(void)
     TIM3_Timing=0;
     HC05_SET_FLAG=0;
     while(HC05_SET_FLAG==0 && TIM3_Timing<10)	//等待3s
-            HC05_SET();//检测蓝牙按键	
+        HC05_SET();//检测蓝牙按键	
     if(HC05_SET_FLAG) {	//配网
         res=HCO5_AT_Confg();//开始设置		
         if(res)		
@@ -129,7 +131,8 @@ void Send_BlueTooth(void)
 //////////////////////////////////////////////////////////////////////////////////////////////////////
     NImingV7_Sendbuf_Init();	//适配匿名上位机的协议	
 ///////////////////////////////////////////////////////////////////////////
-    LED_1=LED_OFF;	LED_2=LED_OFF;
+    LED_1=LED_OFF;	
+    LED_2=LED_OFF;
     TIM3_Init(10000,7200);	//WIFI设置检测
     Main_printf("发送数据\r\n");
     delay_s(1);
@@ -146,12 +149,13 @@ void Send_BlueTooth(void)
             break;
         }
 ////////////////////////////////////////////////////////////////////////////////////
-        if(TIM3_Timing == 10) {	//电量监测
+        // 电池电量监测
+        if(TIM3_Timing == 10) {	
             TIM3_Timing=0;
             BAT_VOL = (u16)((float)ADCConvertedValue[1] / ADCConvertedValue[2]*1200)*2;
             Main_printf("BAT_VOL %d mV ",BAT_VOL);			
-            if(LowPower_flag==0){
-                if(BAT_VOL<3200) {//低电量报警
+            if (LowPower_flag==0){
+                if (BAT_VOL<3200) {//低电量报警
                     LowPower_flag=1;
                     #if LOWPOWER ==1//低功耗
                     TIM3_Init(2000,1600);
@@ -160,7 +164,7 @@ void Send_BlueTooth(void)
                     #endif
                 }
             } else if(LowPower_flag==1) {
-                if(BAT_VOL<2900) {//低电量待机
+                if (BAT_VOL<2900) {//低电量待机
                         LowPower_flag=2;
                     #if LOWPOWER ==1//低功耗
                         TIM3_Init(1000,1600);
@@ -171,14 +175,14 @@ void Send_BlueTooth(void)
             }
         }
 ////////////////////////////////////////////////////////////////////////////////////				
-        if(USART2_RX_EVENT) { //串口数据接收				
+        //串口数据接收
+        if(USART2_RX_EVENT) { 				
             if(UART2_DMA_Finish==0) { //串口未被占用						
                 USART2_RX_EVENT=0;
 
                 Main_printf("串口数据接收:");
-                for(i=0;i<USART2_RX_LEN;i++)
-                {
-                        Main_printf("%x ",USART2_RX_BUF[i]);
+                for(i=0; i<USART2_RX_LEN; i++) {                
+                    Main_printf("%x ",USART2_RX_BUF[i]);
                 }
                 Main_printf("\r\n");
         ////////////////////////////////////////////////////////////////////////////////////	
@@ -189,13 +193,14 @@ void Send_BlueTooth(void)
             }
         }
 ////////////////////////////////////////////////////////////////////////////////////
-        if(UART_Info->Queue_pop_flag==1) {	//队列数据取出标志
+        //队列数据取出标志
+        if(UART_Info->Queue_pop_flag == 1) {	
             if(UART2_DMA_Finish==0) { //DMA空闲
-                UART2_DMA_Finish=1;
-                UART_Info->Queue_pop_flag=0;
+                UART2_DMA_Finish = 1;
+                UART_Info->Queue_pop_flag = 0;
                 DMA_Enable(DMA1_Channel7,UART_SEND_LENGTH);//发送数据
-            } else if (UART_Info->UART_Queue->Queue_Full_flag==1) {
-                UART_Info->UART_Queue->Queue_Full_flag=0;
+            } else if (UART_Info->UART_Queue->Queue_Full_flag == 1) {
+                UART_Info->UART_Queue->Queue_Full_flag = 0;
                 Main_printf("f ");
             }
         } else if (serch_queue_data(UART_Info->UART_Queue)) {//队列有数据				
@@ -209,8 +214,9 @@ void Send_BlueTooth(void)
                 UART_Info->sendbuf[4+i*8]=*(*(UART_Info->UART_Queue->databuf + UART_Info->UART_Queue->front)+1+i*2); //低位在前
                 UART_Info->sendbuf[5+i*8]=*(*(UART_Info->UART_Queue->databuf + UART_Info->UART_Queue->front)+0+i*2);
                 //校验位
-                sumcheck = 0;addcheck=0;
-                for(j=0;j< 6 ;j++) {								
+                sumcheck = 0;
+                addcheck = 0;
+                for(j=0; j < 6 ;j++) {								
                     sumcheck += UART_Info->sendbuf[j+i*8];	
                     addcheck += sumcheck;					
                 }
@@ -235,21 +241,21 @@ void USART2_rec_EVENT(void)
 {
     if(Str_search(USART2_RX_BUF,USART2_RX_LEN,"AT+2000")==0)//查询字符串
     {
-            Main_printf("修改采样率2000\r\n");	
-            TIM4_Init(RATE_2000,720);		//2K采样 50
-            TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
+        Main_printf("修改采样率2000\r\n");	
+        TIM4_Init(RATE_2000,720);		//2K采样 50
+        TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
     }
     if(Str_search(USART2_RX_BUF,USART2_RX_LEN,"AT+1000")==0)//查询字符串
     {
-            Main_printf("修改采样率1000\r\n");
-            TIM4_Init(RATE_1000,720);		//1K采样 100
-            TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
+        Main_printf("修改采样率1000\r\n");
+        TIM4_Init(RATE_1000,720);		//1K采样 100
+        TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
     }
     if(Str_search(USART2_RX_BUF,USART2_RX_LEN,"AT+0500")==0)//查询字符串
     {
-            Main_printf("修改采样率500\r\n");	
-            TIM4_Init(RATE_500,720);		//2K采样 50
-            TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
+        Main_printf("修改采样率500\r\n");	
+        TIM4_Init(RATE_500,720);		//2K采样 50
+        TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
     }
 }
 
@@ -258,10 +264,8 @@ void USART2_rec_EVENT(void)
 //32次采样1帧
 u8 NImingV7_Sendbuf_Init(void)
 {
-    u16 i;
-    
+    u16 i;    
     u8 datalength = 8;//一次采样要发送的数据长度
-
     memset(UART_Info->sendbuf,0,UART_SEND_LENGTH);//清零
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
     //匿名上位机协议
@@ -303,7 +307,8 @@ void SystemInit8 (void)
         // SYSCLK 周期与闪存访问时间的比例设置			
         FLASH->ACR |= FLASH_ACR_PRFTBE;//使能 FLASH 预存取缓冲区
         FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);//Flash 0等待状态		
-        FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;	// 0： 0 < SYSCLK <= 24M// 1： 24< SYSCLK <= 48M			// 2： 48< SYSCLK <= 72M 				    
+        FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;	
+        // 0： 0 < SYSCLK <= 24M// 1： 24< SYSCLK <= 48M			// 2： 48< SYSCLK <= 72M 				    
 
                     
         RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;    /* HCLK = SYSCLK */      

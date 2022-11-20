@@ -34,71 +34,64 @@ STM32 ADC的时钟不要超过14MHz，否则转换精度会下降。
 
 volatile u16 ADCConvertedValue[ADCBUF_SIZE];//用来存放ADC转换结果，也是DMA的目标地址,3通道，每通道采集10次后面取平均数
 
-
-
 u16 BAT_VOL;
 u8 BAT_Percent;
 u8 LowPower_flag;
 u8 power_detective;
 
-
 //设置ADC
 void adc1_init(void)
 {
-		GPIO_InitTypeDef GPIO_InitStructure;
-		ADC_InitTypeDef ADC_InitStructure;
-	
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_ADC1,ENABLE);
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);	
-		RCC_ADCCLKConfig(RCC_PCLK2_Div6);//分频   设置adc时钟分频
-		//RCC_ADCCLKConfig(RCC_PCLK2_Div2);//分频   设置adc时钟分频
+    GPIO_InitTypeDef GPIO_InitStructure;
+    ADC_InitTypeDef ADC_InitStructure;
 
-		GPIO_InitStructure.GPIO_Pin=GPIO_Pin_7;       //adc输入引脚
-		GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AIN;   //模拟输入 
-		GPIO_Init(GPIOA,&GPIO_InitStructure);
-	
-		GPIO_InitStructure.GPIO_Pin=GPIO_Pin_1;       //adc输入引脚
-		GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AIN;   //模拟输入 
-		GPIO_Init(GPIOB,&GPIO_InitStructure); 
-	
-		ADC_DeInit(ADC1);//复位ADC1，设为缺省值
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;     //独立模式
-		//ADC_InitStructure.ADC_Mode = ADC_Mode_RegSimult;     //ADC同步 1 2 DMA用
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_ADC1,ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);	
+    RCC_ADCCLKConfig(RCC_PCLK2_Div6);//分频   设置adc时钟分频
+    //RCC_ADCCLKConfig(RCC_PCLK2_Div2);//分频   设置adc时钟分频
 
-		//ADC_InitStructure.ADC_ScanConvMode = DISABLE; //数模转换：扫描（多通道）模式=ENABLE  单次（单通道）模式=DISABLE
-		ADC_InitStructure.ADC_ScanConvMode = ENABLE; //数模转换：扫描（多通道）模式=ENABLE  单次（单通道）模式=DISABLE
-		
-		ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;     //连续执行还是单次执行 定时器触发需要关闭
-		//ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;  //DISABLE单通道模式，enable多通道扫描模式 
+    GPIO_InitStructure.GPIO_Pin=GPIO_Pin_7;       //adc输入引脚
+    GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AIN;   //模拟输入 
+    GPIO_Init(GPIOA,&GPIO_InitStructure);
 
-		//ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;   //触发方式 软件
-		ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T4_CC4;   //触发方式 定时器4 CC4
+    GPIO_InitStructure.GPIO_Pin=GPIO_Pin_1;       //adc输入引脚
+    GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AIN;   //模拟输入 
+    GPIO_Init(GPIOB,&GPIO_InitStructure); 
 
-		ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;   //数据右对齐
-		ADC_InitStructure.ADC_NbrOfChannel = 3;                 //顺序进行规则转换的通道数  
-		ADC_Init(ADC1, &ADC_InitStructure);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//设置指定ADC的规则组通道，设置它们的转化顺序和采样时间
-		ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_239Cycles5 );
-		ADC_RegularChannelConfig(ADC1, ADC_Channel_9, 2, ADC_SampleTime_239Cycles5 );
-		ADC_RegularChannelConfig(ADC1, ADC_Channel_17, 3, ADC_SampleTime_239Cycles5 );
+    ADC_DeInit(ADC1);//复位ADC1，设为缺省值
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;     //独立模式
+    //ADC_InitStructure.ADC_Mode = ADC_Mode_RegSimult;     //ADC同步 1 2 DMA用
 
-		ADC_DMACmd(ADC1, ENABLE);//开启DMA ADC采集
+    //ADC_InitStructure.ADC_ScanConvMode = DISABLE; //数模转换：扫描（多通道）模式=ENABLE  单次（单通道）模式=DISABLE
+    ADC_InitStructure.ADC_ScanConvMode = ENABLE; //数模转换：扫描（多通道）模式=ENABLE  单次（单通道）模式=DISABLE
+    
+    ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;     //连续执行还是单次执行 定时器触发需要关闭
+    //ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;  //DISABLE单通道模式，enable多通道扫描模式 
 
-		ADC_Cmd(ADC1,ENABLE);
-		
-		ADC_ResetCalibration(ADC1);//重新指定adc校准寄存器		
-		while(ADC_GetResetCalibrationStatus(ADC1));//获取ADC重置校准寄存器状态
-		ADC_StartCalibration(ADC1);//开始指定adc校准状态
-		while(ADC_GetCalibrationStatus(ADC1));//获取指定adc的校准程序	
-		
-		
-		ADC_SoftwareStartConvCmd(ADC1, ENABLE);//使能或者失能指定的ADC的软件转换启动功能		
-		
-		ADC_ExternalTrigConvCmd(ADC1, ENABLE);//开启外部触发模式使能
+    //ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;   //触发方式 软件
+    ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T4_CC4;   //触发方式 定时器4 CC4
 
-		ADC_TempSensorVrefintCmd(ENABLE); //开启内部参考电压 1.2V 使用内部参考电压计算电量百分比
+    ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;   //数据右对齐
+    ADC_InitStructure.ADC_NbrOfChannel = 3;                 //顺序进行规则转换的通道数  
+    ADC_Init(ADC1, &ADC_InitStructure);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //设置指定ADC的规则组通道，设置它们的转化顺序和采样时间
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_239Cycles5 );
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_9, 2, ADC_SampleTime_239Cycles5 );
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_17, 3, ADC_SampleTime_239Cycles5 );
+
+    ADC_DMACmd(ADC1, ENABLE);//开启DMA ADC采集
+    ADC_Cmd(ADC1,ENABLE);
+    
+    ADC_ResetCalibration(ADC1);//重新指定adc校准寄存器		
+    while(ADC_GetResetCalibrationStatus(ADC1));//获取ADC重置校准寄存器状态
+    ADC_StartCalibration(ADC1);//开始指定adc校准状态
+    while(ADC_GetCalibrationStatus(ADC1));//获取指定adc的校准程序	
+        
+    ADC_SoftwareStartConvCmd(ADC1, ENABLE);//使能或者失能指定的ADC的软件转换启动功能		    
+    ADC_ExternalTrigConvCmd(ADC1, ENABLE);//开启外部触发模式使能
+    ADC_TempSensorVrefintCmd(ENABLE); //开启内部参考电压 1.2V 使用内部参考电压计算电量百分比
 }
 
 
