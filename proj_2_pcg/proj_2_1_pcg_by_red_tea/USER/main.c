@@ -23,22 +23,18 @@ AT指令 下面条指令用于修改采样率
 #define RATE_1000  100
 #define RATE_500   200
 
-//////////////////////////////////////////////////////////////////////
-void SystemInit8 (void);
 void SoftReset(void);//软件复位
 void Send_BlueTooth(void);
 void Send_WIFI(void);
-void USART2_rec_EVENT(void);
-
+void USART2_REC_EVENT(void);
 u8 NImingV7_Sendbuf_Init(void);
 //////////////////////////////////////////////////////////////////////
 
 //main
 int main(void)
 {	
-    work_state=SEND_BULE;
-////////////////////////////////////////////////////////////////////////////////
-//系统初始化 72M
+    g_WorkState = SEND_BULE;
+	//系统初始化 72M
     SystemInit();	
     delay_init();	
     delay_ms(100);
@@ -49,34 +45,25 @@ int main(void)
     uart1_init(460800);//串口初始化
     Main_printf("开机\r\n");
     Main_printf("STM32F103C8 V5.1.2 单通道心音采集  配套硬件 V2.1.5 2022-07-26\r\n");	
-////////////////////////////////////////////////////////////////////////////////
+
     LED1 = LED_ON;	
     LED2 = LED_ON;
     delay_ms(1000);		
     LED1 = LED_OFF;
     LED2 = LED_OFF;
-////////////////////////////////////////////////////////////////////////////////
-//		//初始化系统时钟	 8M		
-//		__disable_irq();//关总中断
-//		SystemInit8();
-//		SystemCoreClockUpdate();//当系统时钟发生变化时,用此函数更新时钟
-//		__enable_irq();//开总中断			
-//		delay_init();	//延时函数初始化
-//		delay_ms(100);	
-//		uart1_init(460800);//串口及DMA初始化
-//		Main_printf("降频到8M\r\n");	
-////////////////////////////////////////////////////////////////////////////////			
+		
     TIM1_Init(30000,7200);//按键检测（预留功能）	
     TIM2_Init(10,7200);		//串口数据解析
     TIM3_Init(10000,7200);//系统指示灯	
     TIM4_Init(RATE_2000,720);//采样率设置
-////////////////////////////////////////////////////////////////////////////////
-    //ADC初始化
+
+	//ADC初始化
     Main_printf("DMA ADC 初始化\r\n");
-    adc1_init();
-    ADC_DMA_Config(ADCConvertedValue,3);
+    ADC1_Init();
+    ADC_DMA_Config(ADCConvertedValue, 3);
     Main_printf("DMA ADC 初始化完成\r\n");		
-///////////////////////////////////////////////////////////////////////////
+
+	// 串口数据申请内存
     UART_Info = (_UART_Info*)mymalloc(SRAMIN, sizeof(_UART_Info)); //队列结构
     UART_Info->UART_Queue =  queue_init(UART_QUEUE_SIZE, UART_QUEUE_LENGTH) ;//循环队列初始化
     UART_Info->sendbuf = (u8*)mymalloc(SRAMIN, UART_SEND_LENGTH);	//发送缓冲区 
@@ -86,7 +73,8 @@ int main(void)
         Main_printf("串口缓存,内存申请成功\r\n");
     }
     Main_printf("内存当前占用 %d\r\n", mem_perused(SRAMIN));
-///////////////////////////////////////////////////////////////////////////				
+
+	// 启动循环任务
     while(1) {
         Send_BlueTooth();
     }
@@ -124,7 +112,7 @@ void Send_BlueTooth(void)
     Main_printf("开启蓝牙串口及DMA中断\r\n");
     HC05_ON;//开蓝牙		
     HC05_uart_init(460800);//串口初始化 HC05串口	
-    DMA_Config(DMA1_Channel7,(u32)&USART2->DR,(u32)UART_Info->sendbuf);
+    DMA_Config(DMA1_Channel7, (u32)&USART2->DR, (u32)UART_Info->sendbuf);
     UART2_DMA_TX_NVIC_Config(1);	//开启串口 DMA中断
     USART_DMACmd(USART2,USART_DMAReq_Tx,ENABLE);	//DMA
     UART2_DMA_Finish=0;
@@ -181,12 +169,12 @@ void Send_BlueTooth(void)
                 USART2_RX_EVENT=0;
 
                 Main_printf("串口数据接收:");
-                for(i=0; i<USART2_RX_LEN; i++) {                
-                    Main_printf("%x ",USART2_RX_BUF[i]);
+                for(i=0; i < USART2_RX_LEN; i++) {                
+                    Main_printf("%x ", g_Usart2RxBuf[i]);
                 }
                 Main_printf("\r\n");
         ////////////////////////////////////////////////////////////////////////////////////	
-                USART2_rec_EVENT();
+                USART2_REC_EVENT();
         ////////////////////////////////////////////////////////////////////////////////////		
                 USART2_Clear();
                 USART_ITConfig(USART2, USART_IT_RXNE, ENABLE); 			//串口2接收中断 
@@ -195,10 +183,10 @@ void Send_BlueTooth(void)
 ////////////////////////////////////////////////////////////////////////////////////
         //队列数据取出标志
         if(UART_Info->Queue_pop_flag == 1) {	
-            if(UART2_DMA_Finish==0) { //DMA空闲
+            if(UART2_DMA_Finish == 0) { //DMA空闲
                 UART2_DMA_Finish = 1;
                 UART_Info->Queue_pop_flag = 0;
-                DMA_Enable(DMA1_Channel7,UART_SEND_LENGTH);//发送数据
+                DMA_Enable(DMA1_Channel7, UART_SEND_LENGTH);//发送数据
             } else if (UART_Info->UART_Queue->Queue_Full_flag == 1) {
                 UART_Info->UART_Queue->Queue_Full_flag = 0;
                 Main_printf("f ");
@@ -236,23 +224,23 @@ void Send_BlueTooth(void)
     UART2_DMA_Finish=0;
 }
 
-////数据接收处理
-void USART2_rec_EVENT(void) 
+////数据接收处理，用于修改ADC采样率
+void USART2_REC_EVENT(void) 
 {
-    if(Str_search(USART2_RX_BUF,USART2_RX_LEN,"AT+2000")==0)//查询字符串
-    {
+	//查询字符串
+    if(Str_search(g_Usart2RxBuf,USART2_RX_LEN,"AT+2000")==0) {
         Main_printf("修改采样率2000\r\n");	
         TIM4_Init(RATE_2000,720);		//2K采样 50
         TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
     }
-    if(Str_search(USART2_RX_BUF,USART2_RX_LEN,"AT+1000")==0)//查询字符串
-    {
+	//查询字符串
+    if(Str_search(g_Usart2RxBuf,USART2_RX_LEN,"AT+1000")==0) {    
         Main_printf("修改采样率1000\r\n");
         TIM4_Init(RATE_1000,720);		//1K采样 100
         TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
     }
-    if(Str_search(USART2_RX_BUF,USART2_RX_LEN,"AT+0500")==0)//查询字符串
-    {
+	//查询字符串
+    if(Str_search(g_Usart2RxBuf,USART2_RX_LEN,"AT+0500")==0) {    
         Main_printf("修改采样率500\r\n");	
         TIM4_Init(RATE_500,720);		//2K采样 50
         TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE );//允许更新	
@@ -281,53 +269,6 @@ u8 NImingV7_Sendbuf_Init(void)
 }
 
 
-//修改HCLK时钟为8M
-void SystemInit8 (void)
-{
-  __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
-
-    RCC->CR |= (uint32_t)0x00000001;		//打开HSI(内部高速时钟8M)
-    RCC->CFGR &= (uint32_t)0xF0FF0000;	//RCC_CFGR寄存器初始化									
-    RCC->CR &= (uint32_t)0xFEF6FFFF;		//将RCC_CR寄存器HSEON,CSSON,PLLON位置0
-    RCC->CR &= (uint32_t)0xFFFBFFFF;		//将RCC_CR寄存器HSEBYP位置0
-    RCC->CFGR &= (uint32_t)0xFF80FFFF;	//将RCC_CFGR寄存器PLLSRC, PLLXTPRE, 	
-    RCC->CIR = 0x009F0000;		//关闭所有的中断和对应的位(初始化中断) 
-    RCC->CR |= ((uint32_t)RCC_CR_HSEON);	//使能HSE(外部高速时钟)
-    do//等待 HSE 启动稳定，并做超时处理
-    {
-        HSEStatus = RCC->CR & RCC_CR_HSERDY;
-        StartUpCounter++;  
-    } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
-
-    //判断HSE是否就绪  
-    if ((RCC->CR & RCC_CR_HSERDY) != RESET)		HSEStatus = (uint32_t)0x01;
-    else			HSEStatus = (uint32_t)0x00;  	
-    if (HSEStatus == (uint32_t)0x01)// HSE 启动成功，则继续往下处理
-    {
-        // SYSCLK 周期与闪存访问时间的比例设置			
-        FLASH->ACR |= FLASH_ACR_PRFTBE;//使能 FLASH 预存取缓冲区
-        FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);//Flash 0等待状态		
-        FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;	
-        // 0： 0 < SYSCLK <= 24M// 1： 24< SYSCLK <= 48M			// 2： 48< SYSCLK <= 72M 				    
-
-                    
-        RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;    /* HCLK = SYSCLK */      
-        RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;    /* PCLK2 = HCLK */ 
-        RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;    /* PCLK1 = HCLK */
-        
-        //选择HSE作为系统时钟源
-        RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
-        RCC->CFGR |= (uint32_t)RCC_CFGR_SW_HSE;    
-        //等待HSE作为系统时钟源
-        while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x04)
-        {
-        }		
-    }
-    else		
-        NVIC_SystemReset(); // 复位
-}
-
-
 void SoftReset(void)//软件复位
 {
     //__disable_irq()只是禁止CPU去响应中断，没有真正的去屏蔽中断的触发
@@ -342,3 +283,4 @@ RO-data：即 Read Only-data， 表示程序定义的常量，如 const 类型（FLASH）
 RW-data：即 Read Write-data， 表示已被初始化的全局变量（SRAM）
 ZI-data：即 Zero Init-data， 表示未被初始化的全局变量(SRAM)
 ***********************************************************************/
+

@@ -46,7 +46,7 @@ extern u16 USART_RX_STA;         		//接收状态标记
 //extern u16 USART1_RX_LEN;
 //extern u16 USART1_TIME;
 
-extern u8 USART2_RX_BUF[USART_REC_LEN] ;   //接收缓冲   
+extern u8 g_Usart2RxBuf[USART_REC_LEN] ;   //接收缓冲   
 extern u16 USART2_RX_LEN;         		//接收状态标记	
 extern u16 USART2_TIME;
 extern u16 USART2_RX_EVENT;

@@ -76,6 +76,6 @@ void MSR_MSP(u32 addr);	//设置堆栈地址
 #define		SEND_USB			 4 //USB发送
 #define		SEND_WIFI			 5 //写SD卡
 
-extern u8 work_state;		//工作状态
+extern u8 g_WorkState;		//工作状态
 
 #endif

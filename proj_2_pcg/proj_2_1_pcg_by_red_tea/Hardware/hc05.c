@@ -62,10 +62,10 @@ s16 HC05_SendCmd(u8* cmd, u8* result, u16 timeOut)
 {		
     s16 res;
     HC05_CLEAR();//清空缓冲区
-    USARTx_Send(HC05_UART,(uint8_t*) cmd, strlen(cmd));
+    USARTx_Send(HC05_UART, (uint8_t*)cmd, strlen(cmd));
     delay_ms(timeOut);
     HC05_DEBUG("HC05 rsp:%s \r\n",HC05_RX_BUF);		
-    res = Str_search(HC05_RX_BUF,HC05_RX_LEN,result);//查询字符串
+    res = Str_search(HC05_RX_BUF, HC05_RX_LEN, result);//查询字符串
     return res;
 }
 
@@ -139,9 +139,9 @@ end:
     HC05_OFF;//关蓝牙电源
     
     if(res == 0)
-            HC05_DEBUG("蓝牙设置成功\r\n");
+    	HC05_DEBUG("蓝牙设置成功\r\n");
     else
-            HC05_DEBUG("蓝牙设置失败\r\n");
+    	HC05_DEBUG("蓝牙设置失败\r\n");
     HC05_OFF;//关蓝牙电源
     
     return res;

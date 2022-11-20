@@ -15,7 +15,7 @@
 #define HC05_UART   USART2
 #define HC05_uart_init(x)   uart2_init(x)
 #define HC05_RX_LEN		USART2_RX_LEN
-#define HC05_RX_BUF		USART2_RX_BUF
+#define HC05_RX_BUF		g_Usart2RxBuf
 #define HC05_CLEAR()  USART2_Clear()
 
 ////////////////////////////////////////////////////////////////////////////////

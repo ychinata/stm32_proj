@@ -40,7 +40,8 @@ u8 LowPower_flag;
 u8 power_detective;
 
 //设置ADC
-void adc1_init(void)
+// IO-PA7/PB1
+void ADC1_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     ADC_InitTypeDef ADC_InitStructure;
@@ -59,7 +60,8 @@ void adc1_init(void)
     GPIO_Init(GPIOB,&GPIO_InitStructure); 
 
     ADC_DeInit(ADC1);//复位ADC1，设为缺省值
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;     //独立模式
     //ADC_InitStructure.ADC_Mode = ADC_Mode_RegSimult;     //ADC同步 1 2 DMA用
 
@@ -75,7 +77,8 @@ void adc1_init(void)
     ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;   //数据右对齐
     ADC_InitStructure.ADC_NbrOfChannel = 3;                 //顺序进行规则转换的通道数  
     ADC_Init(ADC1, &ADC_InitStructure);
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     //设置指定ADC的规则组通道，设置它们的转化顺序和采样时间
     ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_239Cycles5 );
     ADC_RegularChannelConfig(ADC1, ADC_Channel_9, 2, ADC_SampleTime_239Cycles5 );
@@ -93,8 +96,6 @@ void adc1_init(void)
     ADC_ExternalTrigConvCmd(ADC1, ENABLE);//开启外部触发模式使能
     ADC_TempSensorVrefintCmd(ENABLE); //开启内部参考电压 1.2V 使用内部参考电压计算电量百分比
 }
-
-
 
 
 ////获得 ADC 值
