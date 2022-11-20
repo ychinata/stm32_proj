@@ -60,7 +60,7 @@ int main(void)
 	//ADC初始化
     Main_printf("DMA ADC 初始化\r\n");
     ADC1_Init();
-    ADC_DMA_Config(ADCConvertedValue, 3);
+    DMA_ADC_Config(ADCConvertedValue, 3);
     Main_printf("DMA ADC 初始化完成\r\n");		
 
 	// 串口数据申请内存
@@ -86,10 +86,9 @@ void Send_BlueTooth(void)
     u16 i,j,z,res;
     u8 addcheck=0;
     u8 sumcheck=0;	
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
+	
     Main_printf("蓝牙发送\r\n");
     Main_printf("内存当前占用 %d\r\n",mem_perused(SRAMIN));	
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
     Main_printf("蓝牙设置检测\r\n");
     TIM3_Init(3000,7200);	//WIFI设置检测
     TIM3_Timing=0;
@@ -108,35 +107,34 @@ void Send_BlueTooth(void)
         TIM_Cmd(TIM3, DISABLE); 	
         SoftReset();				
     }
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+
     Main_printf("开启蓝牙串口及DMA中断\r\n");
     HC05_ON;//开蓝牙		
     HC05_uart_init(460800);//串口初始化 HC05串口	
     DMA_Config(DMA1_Channel7, (u32)&USART2->DR, (u32)UART_Info->sendbuf);
-    UART2_DMA_TX_NVIC_Config(1);	//开启串口 DMA中断
+    DMA_UART2_TX_NVIC_Config(ENABLE);	//开启串口 DMA中断
     USART_DMACmd(USART2,USART_DMAReq_Tx,ENABLE);	//DMA
-    UART2_DMA_Finish=0;
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+    g_Uart2DmaFinishFlag = 0;
     NImingV7_Sendbuf_Init();	//适配匿名上位机的协议	
-///////////////////////////////////////////////////////////////////////////
-    LED_1=LED_OFF;	
-    LED_2=LED_OFF;
+    
+    LED_1 = LED_OFF;	
+    LED_2 = LED_OFF;
     TIM3_Init(10000,7200);	//WIFI设置检测
     Main_printf("发送数据\r\n");
     delay_s(1);
     KEY_TYPE=0;
     LowPower_flag=0;
     TIM3_Timing=0;
-    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE );//允许更新
-    ADC_DMA_NVIC_Config(1);//开启DMA ADC中断			
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);//允许更新
+    DMA_ADC_NVIC_Config(ENABLE);//开启DMA ADC中断			
+
     while(1) {	
         Key_Scan();//按键检测
         if(KEY_TYPE) {
             KEY_TYPE=0;
             break;
         }
-////////////////////////////////////////////////////////////////////////////////////
+
         // 电池电量监测
         if(TIM3_Timing == 10) {	
             TIM3_Timing=0;
@@ -162,10 +160,10 @@ void Send_BlueTooth(void)
                 }
             }
         }
-////////////////////////////////////////////////////////////////////////////////////				
+
         //串口数据接收
-        if(USART2_RX_EVENT) { 				
-            if(UART2_DMA_Finish==0) { //串口未被占用						
+        if (USART2_RX_EVENT) { 				
+            if (g_Uart2DmaFinishFlag == 0) { //串口未被占用						
                 USART2_RX_EVENT=0;
 
                 Main_printf("串口数据接收:");
@@ -173,18 +171,17 @@ void Send_BlueTooth(void)
                     Main_printf("%x ", g_Usart2RxBuf[i]);
                 }
                 Main_printf("\r\n");
-        ////////////////////////////////////////////////////////////////////////////////////	
                 USART2_REC_EVENT();
-        ////////////////////////////////////////////////////////////////////////////////////		
                 USART2_Clear();
                 USART_ITConfig(USART2, USART_IT_RXNE, ENABLE); 			//串口2接收中断 
             }
         }
-////////////////////////////////////////////////////////////////////////////////////
+
+
         //队列数据取出标志
         if(UART_Info->Queue_pop_flag == 1) {	
-            if(UART2_DMA_Finish == 0) { //DMA空闲
-                UART2_DMA_Finish = 1;
+            if (g_Uart2DmaFinishFlag == 0) { //DMA空闲
+                g_Uart2DmaFinishFlag = 1;
                 UART_Info->Queue_pop_flag = 0;
                 DMA_Enable(DMA1_Channel7, UART_SEND_LENGTH);//发送数据
             } else if (UART_Info->UART_Queue->Queue_Full_flag == 1) {
@@ -215,13 +212,12 @@ void Send_BlueTooth(void)
             //取数据，队头自增，存数据，队尾自增
             UART_Info->UART_Queue->front = (UART_Info->UART_Queue->front+1) % UART_Info->UART_Queue->capacity;                       
         }
-////////////////////////////////////////////////////////////////////////////////////
     }	
     TIM_ITConfig(TIM2, TIM_IT_Update, DISABLE );//允许更新										
     TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE );//禁止更新		
     queue_clear(UART_Info->UART_Queue);
-    UART2_DMA_TX_NVIC_Config(0);
-    UART2_DMA_Finish=0;
+    DMA_UART2_TX_NVIC_Config(DISABLE);
+    g_Uart2DmaFinishFlag = 0;
 }
 
 ////数据接收处理，用于修改ADC采样率
@@ -255,7 +251,7 @@ u8 NImingV7_Sendbuf_Init(void)
     u16 i;    
     u8 datalength = 8;//一次采样要发送的数据长度
     memset(UART_Info->sendbuf,0,UART_SEND_LENGTH);//清零
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+
     //匿名上位机协议
     for(i=0;i<100;i++) //一包N次采样 32 *8 =256字节
     {		
