@@ -34,21 +34,20 @@ __align(4) typedef struct {
 /////////////////////////////////////////////////////////////////////
 
 //外部函数
-QueueInfo *queue_init(u32 capacity,u32 length);//循环队列初始化 
-u8 queue_Deinit(QueueInfo *q);//循环队列注销
+QueueInfo *QUEUE_Init(u32 capacity,u32 length);//循环队列初始化 
+u8 QUEUE_Deinit(QueueInfo *q);//循环队列注销
 
-s8 queue_push_byte(QueueInfo *q, u8 byte) ;
-s8 queue_add(QueueInfo *q, u8 *cache,u8 add,u8 length) ;
-s8 queue_push(QueueInfo *q, u8 *cache,u16 length) ;//数据放入队列
+s8 QUEUE_PushByte(QueueInfo *q, u8 byte) ;
+s8 QUEUE_Add(QueueInfo *q, u8 *cache,u8 add,u8 length) ;
+s8 QUEUE_Push(QueueInfo *q, u8 *cache,u16 length) ;//数据放入队列
 
-s8 queue_pop(QueueInfo *q,u8 *sendbuf,u16 length);//从队列搬运 n个字节 至发送缓冲区
-s8 queue_clear(QueueInfo *q);//从队列搬运 n个字节 至发送缓冲区
+s8 QUEUE_Pop(QueueInfo *q,u8 *sendbuf,u16 length);//从队列搬运 n个字节 至发送缓冲区
+s8 QUEUE_Clear(QueueInfo *q);//从队列搬运 n个字节 至发送缓冲区
 
+s8 QUEUE_SearchData(QueueInfo *q);//检测队列是否有数据
 
-
-s8 serch_queue_data(QueueInfo *q);//检测队列是否有数据
-
-s8 queue_data_push(QueueInfo *q, u8 *cache,u8 length,u16 times);//队列插入数据
+s8 QUEUE_DataPush(QueueInfo *q, u8 *cache,u8 length,u16 times);//队列插入数据
 
 
 #endif
+

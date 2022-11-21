@@ -187,7 +187,7 @@ void TIM4_Init(u16 arr,u16 psc)
 //				cache[2]=ADC_UNION2.adc_buf[0];
 //				cache[3]=ADC_UNION2.adc_buf[1];
 //			
-//				queue_data_push(UART_Info->UART_Queue,cache,4,32);//搬运数据至队列
+//				QUEUE_DataPush(UART_Info->UART_Queue,cache,4,32);//搬运数据至队列
 //			
 //    		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);//清中断标志
 //		}        

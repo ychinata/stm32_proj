@@ -58,7 +58,7 @@
 
 
 //循环队列初始化 容量 长度，此部分放在内部SARM
-QueueInfo *queue_init(u32 capacity,u32 length)//循环队列初始化 
+QueueInfo *QUEUE_Init(u32 capacity,u32 length)//循环队列初始化 
 {
     u32 i;
     QueueInfo *q;
@@ -76,14 +76,14 @@ QueueInfo *queue_init(u32 capacity,u32 length)//循环队列初始化
     q->Queue_Full_flag=0; //队列空标志
 
     q->databuf = (u8 **)mymalloc(SRAMIN,q->capacity *4);//申请动态内存空间，队列容量 32位单片机，指针占用4字节空间
-    if(q->databuf == NULL) {	
+    if (q->databuf == NULL) {	
             myfree(SRAMIN,q);//释放内存
             return NULL; //内存申请失败
     }
 		
-    for(i=0;i<q->capacity;i++) { //队列容量    	
+    for (i=0;i<q->capacity;i++) { //队列容量    	
         *(q->databuf+i) = (u8*)mymalloc(SRAMIN,q->length); //申请 n 个大小为 length 的数组 
-        if(*(q->databuf+i) == NULL) {        		
+        if (*(q->databuf+i) == NULL) {        		
             res=1;
             break;
         }
@@ -95,7 +95,7 @@ QueueInfo *queue_init(u32 capacity,u32 length)//循环队列初始化
         //Wifi_QUEUEbuf_Init(*(q->databuf + i),length);//初始化队列缓存区
     }
 		
-    if(res) {//内存申请失败    
+    if (res) {//内存申请失败    
         while(i) {        
                 myfree(SRAMIN,*(q->databuf+i));
                 i--;
@@ -108,12 +108,12 @@ QueueInfo *queue_init(u32 capacity,u32 length)//循环队列初始化
     return q;//返回初始化的队列指针		
 }
 
-u8 queue_Deinit(QueueInfo *q)//循环队列注销
+u8 QUEUE_Deinit(QueueInfo *q)//循环队列注销
 {
     u16 i;
-    if(q==NULL)		return 1; //指针无效
-    for(i=0;i<q->capacity;i++)
-    {
+    if (q==NULL)		
+		return 1; //指针无效
+    for (i=0; i<q->capacity; i++) {
         myfree(SRAMIN,*(q->databuf+i));//释放内存
     }
     myfree(SRAMIN,q->databuf);//释放内存
@@ -122,15 +122,15 @@ u8 queue_Deinit(QueueInfo *q)//循环队列注销
 }
 
 
-
 //队列首个位置添加一个字节
 //注意判断队列为空还是满，并且保证其不大于capacity。
-s8 queue_push_byte(QueueInfo *q, u8 byte) 
+s8 QUEUE_PushByte(QueueInfo *q, u8 byte) 
 {	
     u16 i;
-    if (q==NULL) return -1; // need queue
-    if ((q->rear+1) % q->capacity == q->front) //队列满了
-    {
+    if (q==NULL) 
+		return -1; // need queue
+	//队列满了	
+    if ((q->rear+1) % q->capacity == q->front) {
         q->front = (q->front+1) % q->capacity;//队头自增，删除最先进入的数据
         //return 0;//满了
     }	
@@ -139,18 +139,20 @@ s8 queue_push_byte(QueueInfo *q, u8 byte)
 
     return 1;    // return push count 		
 }
+
 //队列数组追加一次数据
 //注意判断队列为空还是满，并且保证其不大于capacity。
-s8 queue_add(QueueInfo *q, u8 *cache,u8 add,u8 length) 
+s8 QUEUE_Add(QueueInfo *q, u8 *cache,u8 add,u8 length) 
 {	
     u16 i;
-    if (q==NULL) return -1; // need queue
-    if ((q->rear+1) % q->capacity == q->front) //队列满了
-    {
+    if (q==NULL) 
+		return -1; // need queue
+	//队列满了	
+    if ((q->rear+1) % q->capacity == q->front) {
         //q->front = (q->front+1) % q->capacity;//队头自增，删除最先进入的数据
         return 0;//满了
     }
-    memcpy( *(q->databuf + q->rear)+add,cache,length);//搬运  N 个字节			
+    memcpy(*(q->databuf + q->rear)+add,cache,length);//搬运  N 个字节			
 
     q->rear = (q->rear+1) % q->capacity; //取数据，队头自增，存数据，队尾自增	
     return 1;    // return push count 		
@@ -159,18 +161,17 @@ s8 queue_add(QueueInfo *q, u8 *cache,u8 add,u8 length)
 //数组的前端添加项
 //每次入队时，将元素覆盖在rear处，并将rear后移一位，
 //注意判断队列为空还是满，并且保证其不大于capacity。
-s8 queue_push(QueueInfo *q, u8 *cache,u16 length) 
+s8 QUEUE_Push(QueueInfo *q, u8 *cache,u16 length) 
 {	
     u16 i;
-    if (q==NULL) return -1; // need queue
-    if ((q->rear+1) % q->capacity == q->front) //队列满了
-    {
+    if (q==NULL) 
+		return -1; // need queue
+    //队列满了
+    if ((q->rear+1) % q->capacity == q->front) {
         q->front = (q->front+1) % q->capacity;//队头自增，删除最先进入的数据
         q->Queue_Full_flag=1; //队列空标志
         //return 0;//满了
-    }
-    else
-    {
+    } else {
         q->Queue_Full_flag=0; //队列空标志
     }
     memcpy( *(q->databuf + q->rear),cache,length);//搬运  N 个字节			
@@ -178,6 +179,7 @@ s8 queue_push(QueueInfo *q, u8 *cache,u16 length)
     q->rear = (q->rear+1) % q->capacity; //取数据，队头自增，存数据，队尾自增	
     return 1;    // return push count 		
 }
+
 ////注意这里没有增加队头，需要外部增加，特点情况下使用
 //s8 queue_push2(QueueInfo *q, u8 *cache,u16 length) 
 //{	
@@ -202,7 +204,7 @@ s8 queue_push(QueueInfo *q, u8 *cache,u16 length)
 
 //从数组的后端移除项
 //队列取数据
-s8 queue_pop(QueueInfo *q,u8 *sendbuf,u16 length)//从队列搬运 n个字节 至发送缓冲区
+s8 QUEUE_Pop(QueueInfo *q,u8 *sendbuf,u16 length)//从队列搬运 n个字节 至发送缓冲区
 {	
     if (q==NULL) return -1; // need queue
     if (q->front==q->rear) 		return 0;//队列为空
@@ -213,7 +215,7 @@ s8 queue_pop(QueueInfo *q,u8 *sendbuf,u16 length)//从队列搬运 n个字节 至发送缓冲
     return 1; //取到数据
 }
 //////队列第一个字节是数据长度，这里跳过了第一个字节，特点情况下使用
-////s8 queue_pop(QueueInfo *q,u8 *sendbuf,u16 length)//从队列搬运 n个字节 至发送缓冲区
+////s8 QUEUE_Pop(QueueInfo *q,u8 *sendbuf,u16 length)//从队列搬运 n个字节 至发送缓冲区
 ////{	
 ////	  if (q==NULL) return -1; // need queue
 ////	  if (q->front==q->rear) return 0;//队列为空
@@ -227,26 +229,30 @@ s8 queue_pop(QueueInfo *q,u8 *sendbuf,u16 length)//从队列搬运 n个字节 至发送缓冲
 
 //检测队列是否有数据
 //1 有数据 0 没有数据
-s8 serch_queue_data(QueueInfo *q)
+s8 QUEUE_SearchData(QueueInfo *q)
 {
-    if (q==NULL) return -1; //need queue
-    if (q->front==q->rear) return 0;//队列为空
-    else return 1;//有数据
+    if (q==NULL) 
+		return -1; //need queue
+    if (q->front==q->rear) 
+		return 0;//队列为空
+    else 
+		return 1;//有数据
 }
 
 
 //队列清空
-s8 queue_clear(QueueInfo *q)
+s8 QUEUE_Clear(QueueInfo *q)
 {
     u16 i;
 
-    if(q == NULL)	return -1; //need queue
+    if(q == NULL)	
+		return -1; //need queue
     q->carry_num=0;
     q->front = q->rear = 0; //初始化时，将front与rear都置为0。
     q->Queue_Full_flag=0; //队列空标志
 
-    for(i=0;i<q->capacity;i++) //队列容量
-    {		
+	//队列容量
+    for (i=0;i<q->capacity;i++) {		
         memset( *(q->databuf + i),0,q->length);//清0	
     }
     return 1;
@@ -255,32 +261,30 @@ s8 queue_clear(QueueInfo *q)
 
 //队列的插入，顺次向队列缓存区搬运数据 
 //参数：队列指针，数据来源，要搬运的数据长度，要搬运的次数
-s8 queue_data_push(QueueInfo *q, u8 *cache,u8 length,u16 times) 
+s8 QUEUE_DataPush(QueueInfo *q, u8 *cache,u8 length,u16 times) 
 {	
     u16 i;
     if (q==NULL) return -1; // need queue
-    if ((q->rear+1) % q->capacity == q->front) //队列满了
-    {
+    //队列满了
+    if ((q->rear+1) % q->capacity == q->front) {
         q->front = (q->front+1) % q->capacity;//队头自增，删除最先进入的数据
         q->Queue_Full_flag=1;
         //Main_printf("m ");
         //return 0;//满了
-    }
-    else
-    {
+    } else {
         q->Queue_Full_flag=0;
     }		
     memcpy( *(q->databuf + q->rear)+ q->carry_num *length,cache,length);//搬运  length 个字节
 
     q->carry_num++;//数据搬运次数计数			
-    if(q->carry_num == times) //搬运N次数据
-    {
+    //搬运N次数据
+    if (q->carry_num == times) {
         q->carry_num=0;
         q->rear = (q->rear+1) % q->capacity; //取数据，队头自增，存数据，队尾自增	
     
         return 1; //搬运完成一帧数据
-    }
-    else
-        return 0; 
+    } else {
+		return 0; 
+	}        
 }
 

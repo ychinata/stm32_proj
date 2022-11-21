@@ -23,7 +23,7 @@
 //#define UART_SEND_LENGTH	800	//发送缓冲区  8*100
 //蓝牙
 #define UART_QUEUE_LENGTH	40	//（队列容量）20次采样 2*20=40  
-#define UART_QUEUE_SIZE	100	//队列大小
+#define UART_QUEUE_SIZE		100	//队列大小
 #define UART_SEND_LENGTH	160	//发送缓冲区  8*100
 
 __align(4) typedef struct {

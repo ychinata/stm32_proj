@@ -52,10 +52,10 @@ int main(void)
     LED1 = LED_OFF;
     LED2 = LED_OFF;
 		
-    TIM1_Init(30000,7200);//按键检测（预留功能）	
-    TIM2_Init(10,7200);		//串口数据解析
-    TIM3_Init(10000,7200);//系统指示灯	
-    TIM4_Init(RATE_2000,720);//采样率设置
+    TIM1_Init(30000,7200);		//按键检测（预留功能）	
+    TIM2_Init(10,7200);			//串口数据解析
+    TIM3_Init(10000,7200);		//系统指示灯	
+    TIM4_Init(RATE_2000,720);	//采样率设置
 
 	//ADC初始化
     Main_printf("DMA ADC 初始化\r\n");
@@ -65,7 +65,7 @@ int main(void)
 
 	// 串口数据申请内存
     UART_Info = (_UART_Info*)mymalloc(SRAMIN, sizeof(_UART_Info)); //队列结构
-    UART_Info->UART_Queue =  queue_init(UART_QUEUE_SIZE, UART_QUEUE_LENGTH) ;//循环队列初始化
+    UART_Info->UART_Queue =  QUEUE_Init(UART_QUEUE_SIZE, UART_QUEUE_LENGTH) ;//循环队列初始化
     UART_Info->sendbuf = (u8*)mymalloc(SRAMIN, UART_SEND_LENGTH);	//发送缓冲区 
     if(UART_Info == NULL || UART_Info->UART_Queue == NULL || UART_Info->sendbuf == NULL ) {
         Main_printf("串口缓存,内存申请失败\r\n");
@@ -161,7 +161,7 @@ void Send_BlueTooth(void)
             }
         }
 
-        //串口数据接收
+        // 串口数据接收
         if (USART2_RX_EVENT) { 				
             if (g_Uart2DmaFinishFlag == 0) { //串口未被占用						
                 USART2_RX_EVENT=0;
@@ -178,8 +178,8 @@ void Send_BlueTooth(void)
         }
 
 
-        //队列数据取出标志
-        if(UART_Info->Queue_pop_flag == 1) {	
+        // 队列数据取出标志
+        if (UART_Info->Queue_pop_flag == 1) {	
             if (g_Uart2DmaFinishFlag == 0) { //DMA空闲
                 g_Uart2DmaFinishFlag = 1;
                 UART_Info->Queue_pop_flag = 0;
@@ -188,34 +188,37 @@ void Send_BlueTooth(void)
                 UART_Info->UART_Queue->Queue_Full_flag = 0;
                 Main_printf("f ");
             }
-        } else if (serch_queue_data(UART_Info->UART_Queue)) {//队列有数据				
-            for(i=0;i<20;i++) { //一帧100次采样的数据
+        } else if (QUEUE_SearchData(UART_Info->UART_Queue)) {//队列有数据				
+        	// 一帧100次采样的数据
+            for (i = 0; i < 20; i++) { // 20?
                 //帧1数据长度为8字节		4（帧头）+2（有效数据）+2（校验）=8	
-                UART_Info->sendbuf[0 +i*8]=0xAA;
-                UART_Info->sendbuf[1 +i*8]=0xFF;
-                UART_Info->sendbuf[2 +i*8]=0xF1;	
-                UART_Info->sendbuf[3 +i*8]=2; //有效数据长度 8*4=32 8个导联
+                UART_Info->sendbuf[0 + i*8] = 0xAA;
+                UART_Info->sendbuf[1 + i*8] = 0xFF;
+                UART_Info->sendbuf[2 + i*8] = 0xF1;	
+                UART_Info->sendbuf[3 + i*8] = 2; //有效数据长度 8*4=32 8个导联
                 //MIC
-                UART_Info->sendbuf[4+i*8]=*(*(UART_Info->UART_Queue->databuf + UART_Info->UART_Queue->front)+1+i*2); //低位在前
-                UART_Info->sendbuf[5+i*8]=*(*(UART_Info->UART_Queue->databuf + UART_Info->UART_Queue->front)+0+i*2);
+                UART_Info->sendbuf[4 + i*8] = *(*(UART_Info->UART_Queue->databuf \
+                	+ UART_Info->UART_Queue->front)+1+i*2); //低位在前
+                UART_Info->sendbuf[5 + i*8]=*(*(UART_Info->UART_Queue->databuf \
+					+ UART_Info->UART_Queue->front)+0+i*2);
                 //校验位
                 sumcheck = 0;
                 addcheck = 0;
-                for(j=0; j < 6 ;j++) {								
-                    sumcheck += UART_Info->sendbuf[j+i*8];	
+                for (j = 0; j < 6 ;j++) {	// 对前6位进行校验
+                    sumcheck += UART_Info->sendbuf[j + i*8];	
                     addcheck += sumcheck;					
                 }
-                UART_Info->sendbuf[6+i*8] = sumcheck;	//校验		
-                UART_Info->sendbuf[7+i*8] = addcheck;	//校验		
+                UART_Info->sendbuf[6 + i*8] = sumcheck;	//校验		
+                UART_Info->sendbuf[7 + i*8] = addcheck;	//校验		
             }
-            UART_Info->Queue_pop_flag=1;
+            UART_Info->Queue_pop_flag = 1;
             //取数据，队头自增，存数据，队尾自增
             UART_Info->UART_Queue->front = (UART_Info->UART_Queue->front+1) % UART_Info->UART_Queue->capacity;                       
         }
     }	
-    TIM_ITConfig(TIM2, TIM_IT_Update, DISABLE );//允许更新										
-    TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE );//禁止更新		
-    queue_clear(UART_Info->UART_Queue);
+    TIM_ITConfig(TIM2, TIM_IT_Update, DISABLE);	//允许更新										
+    TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);	//禁止更新		
+    QUEUE_Clear(UART_Info->UART_Queue);
     DMA_UART2_TX_NVIC_Config(DISABLE);
     g_Uart2DmaFinishFlag = 0;
 }
