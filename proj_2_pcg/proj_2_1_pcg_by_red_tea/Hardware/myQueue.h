@@ -20,14 +20,13 @@
 //循环队列 结构体声明	
 __align(4) typedef struct {	
     u8 Queue_Full_flag;
-    u8 Queue_data_state;			//数据状态
-    u32 front, rear;			//front指向队列头，rear为队列尾部
+    u8 Queue_data_state;	//数据状态
+    u32 front, rear;		//front指向队列头，rear为队列尾部
     u32 capacity,length;	//队列大小，容量
     //capacity  队列容量 （队列缓冲区数量） 
-    //length		队列长度/大小 （缓存的数据长度）
-
-    u16 carry_num;				//数据搬运次数，n次打包
-    u8 **databuf;					//二级指针 动态内存申请
+    //length	队列长度/大小 （缓存的数据长度）
+    u16 carry_num;			//数据搬运次数，n次打包
+    u8 **databuf;			//二级指针 动态内存申请
 } QueueInfo;	
  
 

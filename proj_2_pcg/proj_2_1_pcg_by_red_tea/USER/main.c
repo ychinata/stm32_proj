@@ -53,7 +53,7 @@ int main(void)
     LED2 = LED_OFF;
 		
     TIM1_Init(30000,7200);		//按键检测（预留功能）	
-    TIM2_Init(10,7200);			//串口数据解析
+    TIM2_Init(10,7200);			//串口数据解析(修改采样率)
     TIM3_Init(10000,7200);		//系统指示灯	
     TIM4_Init(RATE_2000,720);	//采样率设置
 
@@ -91,11 +91,11 @@ void Send_BlueTooth(void)
     Main_printf("内存当前占用 %d\r\n",mem_perused(SRAMIN));	
     Main_printf("蓝牙设置检测\r\n");
     TIM3_Init(3000,7200);	//WIFI设置检测
-    TIM3_Timing=0;
-    HC05_SET_FLAG=0;
+    TIM3_Timing = 0;
+    HC05_SET_FLAG = 0;
     while(HC05_SET_FLAG==0 && TIM3_Timing<10)	//等待3s
         HC05_SET();//检测蓝牙按键	
-    if(HC05_SET_FLAG) {	//配网
+    if (HC05_SET_FLAG) {	//配网
         res=HCO5_AT_Confg();//开始设置		
         if(res)		
             Main_printf("蓝牙设置失败\r\n");							
@@ -122,16 +122,16 @@ void Send_BlueTooth(void)
     TIM3_Init(10000,7200);	//WIFI设置检测
     Main_printf("发送数据\r\n");
     delay_s(1);
-    KEY_TYPE=0;
-    LowPower_flag=0;
-    TIM3_Timing=0;
+    KEY_TYPE = 0;
+    LowPower_flag = 0;
+    TIM3_Timing = 0;
     TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);//允许更新
     DMA_ADC_NVIC_Config(ENABLE);//开启DMA ADC中断			
 
     while(1) {	
         Key_Scan();//按键检测
         if(KEY_TYPE) {
-            KEY_TYPE=0;
+            KEY_TYPE = 0;
             break;
         }
 
@@ -161,7 +161,7 @@ void Send_BlueTooth(void)
             }
         }
 
-        // 串口数据接收
+        // 串口数据接收(修改ADC采样率)
         if (USART2_RX_EVENT) { 				
             if (g_Uart2DmaFinishFlag == 0) { //串口未被占用						
                 USART2_RX_EVENT=0;
@@ -188,20 +188,22 @@ void Send_BlueTooth(void)
                 UART_Info->UART_Queue->Queue_Full_flag = 0;
                 Main_printf("f ");
             }
-        } else if (QUEUE_SearchData(UART_Info->UART_Queue)) {//队列有数据				
+        } else if (QUEUE_SearchData(UART_Info->UART_Queue)) {//队列有数据
         	// 一帧100次采样的数据
-            for (i = 0; i < 20; i++) { // 20?
+            for (i = 0; i < 20; i++) { // 20帧长?
                 //帧1数据长度为8字节		4（帧头）+2（有效数据）+2（校验）=8	
+                // 1.填充四字节帧头
                 UART_Info->sendbuf[0 + i*8] = 0xAA;
                 UART_Info->sendbuf[1 + i*8] = 0xFF;
                 UART_Info->sendbuf[2 + i*8] = 0xF1;	
-                UART_Info->sendbuf[3 + i*8] = 2; //有效数据长度 8*4=32 8个导联
-                //MIC
+                UART_Info->sendbuf[3 + i*8] = 2; //有效数据长度 8*4=32 8个导联?注释待更新?2023.1.30
+                // 2.填充两字节MIC有效数据
+                // 搬移：队列缓冲区数据->发送缓冲区数据,每次搬2个U8
                 UART_Info->sendbuf[4 + i*8] = *(*(UART_Info->UART_Queue->databuf \
                 	+ UART_Info->UART_Queue->front)+1+i*2); //低位在前
                 UART_Info->sendbuf[5 + i*8]=*(*(UART_Info->UART_Queue->databuf \
 					+ UART_Info->UART_Queue->front)+0+i*2);
-                //校验位
+                // 3.填充两字节校验位
                 sumcheck = 0;
                 addcheck = 0;
                 for (j = 0; j < 6 ;j++) {	// 对前6位进行校验
@@ -216,8 +218,8 @@ void Send_BlueTooth(void)
             UART_Info->UART_Queue->front = (UART_Info->UART_Queue->front+1) % UART_Info->UART_Queue->capacity;                       
         }
     }	
-    TIM_ITConfig(TIM2, TIM_IT_Update, DISABLE);	//允许更新										
-    TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);	//禁止更新		
+    TIM_ITConfig(TIM2, TIM_IT_Update, DISABLE);	//允许更新
+    TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);	//禁止更新
     QUEUE_Clear(UART_Info->UART_Queue);
     DMA_UART2_TX_NVIC_Config(DISABLE);
     g_Uart2DmaFinishFlag = 0;
@@ -275,6 +277,7 @@ void SoftReset(void)//软件复位
     __set_FAULTMASK(1); // 关闭所有中断
     NVIC_SystemReset(); // 复位
 }
+
 /**********************************************************************
 编译结果里面的几个数据的意义：
 Code：表示程序所占用 FLASH 的大小（FLASH）
