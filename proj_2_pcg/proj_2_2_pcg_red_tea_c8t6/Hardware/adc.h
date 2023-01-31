@@ -10,7 +10,7 @@
 
 
 #define ADCBUF_SIZE 3
-extern volatile u16 ADCConvertedValue[ADCBUF_SIZE];//用来存放ADC转换结果，也是DMA的目标地址,3通道，每通道采集10次后面取平均数
+extern volatile u16 g_ADCConvertedValue[ADCBUF_SIZE];//用来存放ADC转换结果，也是DMA的目标地址,3通道，每通道采集10次后面取平均数
 
 /////////////////////////////////////////////////////////////////////
 //typedef union 
@@ -19,7 +19,7 @@ extern volatile u16 ADCConvertedValue[ADCBUF_SIZE];//用来存放ADC转换结果，也是DM
 //		 u8 adc_buf[2];
 //}_ADC_UNION;
 //extern _ADC_UNION  ADC_UNION;
-//				ADC_UNION.ADC_buf=ADCConvertedValue[0]; //通道0 声音
+//				ADC_UNION.ADC_buf=g_ADCConvertedValue[0]; //通道0 声音
 //共用体数据，低位在前	打印结果 0787 87 07 
 //				Main_printf("%04x ",ADC_UNION.ADC_buf);	
 //				Main_printf("%02x ",ADC_UNION.adc_buf[0]);	

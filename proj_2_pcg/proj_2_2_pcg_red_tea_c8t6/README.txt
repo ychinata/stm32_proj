@@ -18,18 +18,20 @@ UART_Info->sendbuf：
 3.DMA1_Channel1/DMA1_Channel7是如何决定的?-2023.1.30
 // USART发送+DMA: DMA1_Channel7,外设(串口)是目的
 // ADC+DMA:DMA1_Channel1,外设(传感器)是源
-4.为什么要使用2个串口
-
+4.为什么要使用2个串口-2023.1.31
+USART1用于CH340，USART2用于蓝牙数据传输
+5.g_UART_Info->UART_Queue->databuf为什么没有填充数据？代码不完整？
 
 TODO:
 1.DMA原理
 两个DMA控制器有12个通道(DMA1有7个通道，DMA2有5个通道)
 2.myquene.c待整理
+3.有线串口替代蓝牙，修改代码，增加串口打印
 
 更名记录：
 UART_Info->g_UART_Info
 _UART_Info->UartInfoStru
 
-编译前修改：
+编译前修改回原状align(align会导致SI不识别)：
 QueueInfo
 UartInfoStru

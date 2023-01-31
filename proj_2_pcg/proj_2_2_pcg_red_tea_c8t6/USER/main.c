@@ -10,7 +10,7 @@
 #include "myQueue.h"
 #include "malloc.h"
 #include "hc05.h"
-
+#include "oled.h"
 
 //////////////////////////////////////////////////////////////////////
 /*
@@ -44,6 +44,9 @@ int main(void)
     KEY_IO_Init();
     HCO5_GPIO_Init();
     UART1_Init(460800);//串口初始化
+    OLED_Init();
+    
+	OLED_ShowString(1, 1, "PCG Demo:");	// 在1行1列显示
     Main_printf("开机\r\n");
     Main_printf("STM32F103C8T6单通道心音采集   V0.1 2023-1-30\r\n");	
 
@@ -61,8 +64,8 @@ int main(void)
 	//ADC初始化
     Main_printf("DMA ADC 初始化\r\n");
     ADC1_Init();
-    DMA_ADC_Config(ADCConvertedValue, 3);
-    Main_printf("DMA ADC 初始化完成\r\n");		
+    DMA_ADC_Config(g_ADCConvertedValue, 3);
+    Main_printf("DMA ADC 初始化完成\r\n");
 
 	// 串口数据申请内存
     g_UART_Info = (UartInfoStru*)mymalloc(SRAMIN, sizeof(UartInfoStru)); //队列结构
@@ -139,8 +142,8 @@ void Send_BlueTooth(void)
 
         // 电池电量监测
         if(g_TIM3_Timing == 10) {	
-            g_TIM3_Timing=0;
-            g_BatVol = (u16)((float)ADCConvertedValue[1] / ADCConvertedValue[2]*1200)*2;
+            g_TIM3_Timing = 0;
+            g_BatVol = (u16)((float)g_ADCConvertedValue[1] / g_ADCConvertedValue[2]*1200)*2;
             Main_printf("Bat Voltage %d mV ",g_BatVol);			
             if (g_LowPowerFlag==0){
                 if (g_BatVol<3200) {//低电量报警
@@ -182,15 +185,15 @@ void Send_BlueTooth(void)
 
         // 队列数据取出标志
         if (g_UART_Info->Queue_pop_flag == 1) {	
-            if (g_Uart2DmaFinishFlag == 0) { //DMA空闲
+            if (g_Uart2DmaFinishFlag == 0) { 					//DMA空闲
                 g_Uart2DmaFinishFlag = 1;
                 g_UART_Info->Queue_pop_flag = 0;
-                DMA_Enable(DMA1_Channel7, UART_SEND_LENGTH);//发送数据
+                DMA_Enable(DMA1_Channel7, UART_SEND_LENGTH);	//发送数据
             } else if (g_UART_Info->UART_Queue->Queue_Full_flag == 1) {
                 g_UART_Info->UART_Queue->Queue_Full_flag = 0;
                 Main_printf("f ");
             }
-        } else if (QUEUE_SearchData(g_UART_Info->UART_Queue)) {//队列有数据
+        } else if (QUEUE_SearchData(g_UART_Info->UART_Queue)) {	//若队列有数据
         	// 一帧100次采样的数据
             for (i = 0; i < 20; i++) { // 20帧长?
                 //帧1数据长度为8字节		4（帧头）+2（有效数据）+2（校验）=8	
