@@ -43,7 +43,7 @@ int main(void)
     LED_IO_Init();		
     KEY_IO_Init();
     HCO5_GPIO_Init();
-    uart1_init(460800);//串口初始化
+    UART1_Init(460800);//串口初始化
     Main_printf("开机\r\n");
     Main_printf("STM32F103C8T6单通道心音采集   V0.1 2023-1-30\r\n");	
 
@@ -65,10 +65,10 @@ int main(void)
     Main_printf("DMA ADC 初始化完成\r\n");		
 
 	// 串口数据申请内存
-    UART_Info = (_UART_Info*)mymalloc(SRAMIN, sizeof(_UART_Info)); //队列结构
-    UART_Info->UART_Queue =  QUEUE_Init(UART_QUEUE_SIZE, UART_QUEUE_LENGTH) ;//循环队列初始化
-    UART_Info->sendbuf = (u8*)mymalloc(SRAMIN, UART_SEND_LENGTH);	//发送缓冲区 
-    if(UART_Info == NULL || UART_Info->UART_Queue == NULL || UART_Info->sendbuf == NULL ) {
+    g_UART_Info = (UartInfoStru*)mymalloc(SRAMIN, sizeof(UartInfoStru)); //队列结构
+    g_UART_Info->UART_Queue =  QUEUE_Init(UART_QUEUE_SIZE, UART_QUEUE_LENGTH) ;//循环队列初始化
+    g_UART_Info->sendbuf = (u8*)mymalloc(SRAMIN, UART_SEND_LENGTH);	//发送缓冲区 
+    if(g_UART_Info == NULL || g_UART_Info->UART_Queue == NULL || g_UART_Info->sendbuf == NULL ) {
         Main_printf("串口缓存,内存申请失败\r\n");
     } else {
         Main_printf("串口缓存,内存申请成功\r\n");
@@ -92,11 +92,11 @@ void Send_BlueTooth(void)
     Main_printf("内存当前占用 %d\r\n",mem_perused(SRAMIN));	
     Main_printf("蓝牙设置检测\r\n");
     TIM3_Init(3000,7200);	//WIFI设置检测
-    TIM3_Timing = 0;
-    HC05_SET_FLAG = 0;
-    while(HC05_SET_FLAG==0 && TIM3_Timing<10)	//等待3s
+    g_TIM3_Timing = 0;
+    g_Hc05SetFlag = 0;
+    while(g_Hc05SetFlag==0 && g_TIM3_Timing<10)	//等待3s
         HC05_SET();//检测蓝牙按键	
-    if (HC05_SET_FLAG) {	//配网
+    if (g_Hc05SetFlag) {	//配网
         res=HCO5_AT_Confg();//开始设置		
         if(res)		
             Main_printf("蓝牙设置失败\r\n");							
@@ -111,8 +111,9 @@ void Send_BlueTooth(void)
 
     Main_printf("开启蓝牙串口及DMA中断\r\n");
     HC05_ON;//开蓝牙		
-    HC05_uart_init(460800);//串口初始化 HC05串口	
-    DMA_Config(DMA1_Channel7, (u32)&USART2->DR, (u32)UART_Info->sendbuf);
+    HC05_uart_init(460800);//串口初始化 HC05串口
+    // UART-DMA配置
+    DMA_UART_Config(DMA1_Channel7, (u32)&USART2->DR, (u32)g_UART_Info->sendbuf);
     DMA_UART2_TX_NVIC_Config(ENABLE);	//开启串口 DMA中断
     USART_DMACmd(USART2,USART_DMAReq_Tx,ENABLE);	//DMA
     g_Uart2DmaFinishFlag = 0;
@@ -123,37 +124,37 @@ void Send_BlueTooth(void)
     TIM3_Init(10000,7200);	//WIFI设置检测
     Main_printf("发送数据\r\n");
     delay_s(1);
-    KEY_TYPE = 0;
-    LowPower_flag = 0;
-    TIM3_Timing = 0;
+    g_KeyType = 0;
+    g_LowPowerFlag = 0;
+    g_TIM3_Timing = 0;
     TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);//允许更新
     DMA_ADC_NVIC_Config(ENABLE);//开启DMA ADC中断			
 
     while(1) {	
         Key_Scan();//按键检测
-        if(KEY_TYPE) {
-            KEY_TYPE = 0;
+        if(g_KeyType) {
+            g_KeyType = 0;
             break;
         }
 
         // 电池电量监测
-        if(TIM3_Timing == 10) {	
-            TIM3_Timing=0;
-            BAT_VOL = (u16)((float)ADCConvertedValue[1] / ADCConvertedValue[2]*1200)*2;
-            Main_printf("BAT_VOL %d mV ",BAT_VOL);			
-            if (LowPower_flag==0){
-                if (BAT_VOL<3200) {//低电量报警
-                    LowPower_flag=1;
-                    #if LOWPOWER ==1//低功耗
+        if(g_TIM3_Timing == 10) {	
+            g_TIM3_Timing=0;
+            g_BatVol = (u16)((float)ADCConvertedValue[1] / ADCConvertedValue[2]*1200)*2;
+            Main_printf("Bat Voltage %d mV ",g_BatVol);			
+            if (g_LowPowerFlag==0){
+                if (g_BatVol<3200) {//低电量报警
+                    g_LowPowerFlag= 1;
+                    #if LOWPOWER == 1//低功耗
                     TIM3_Init(2000,1600);
                     #else
                     TIM3_Init(2000,7200);
                     #endif
                 }
-            } else if(LowPower_flag==1) {
-                if (BAT_VOL<2900) {//低电量待机
-                        LowPower_flag=2;
-                    #if LOWPOWER ==1//低功耗
+            } else if(g_LowPowerFlag==1) {
+                if (g_BatVol<2900) {//低电量待机
+                        g_LowPowerFlag=2;
+                    #if LOWPOWER == 1//低功耗
                         TIM3_Init(1000,1600);
                     #else
                         TIM3_Init(1000,7200);
@@ -180,48 +181,48 @@ void Send_BlueTooth(void)
 
 
         // 队列数据取出标志
-        if (UART_Info->Queue_pop_flag == 1) {	
+        if (g_UART_Info->Queue_pop_flag == 1) {	
             if (g_Uart2DmaFinishFlag == 0) { //DMA空闲
                 g_Uart2DmaFinishFlag = 1;
-                UART_Info->Queue_pop_flag = 0;
+                g_UART_Info->Queue_pop_flag = 0;
                 DMA_Enable(DMA1_Channel7, UART_SEND_LENGTH);//发送数据
-            } else if (UART_Info->UART_Queue->Queue_Full_flag == 1) {
-                UART_Info->UART_Queue->Queue_Full_flag = 0;
+            } else if (g_UART_Info->UART_Queue->Queue_Full_flag == 1) {
+                g_UART_Info->UART_Queue->Queue_Full_flag = 0;
                 Main_printf("f ");
             }
-        } else if (QUEUE_SearchData(UART_Info->UART_Queue)) {//队列有数据
+        } else if (QUEUE_SearchData(g_UART_Info->UART_Queue)) {//队列有数据
         	// 一帧100次采样的数据
             for (i = 0; i < 20; i++) { // 20帧长?
                 //帧1数据长度为8字节		4（帧头）+2（有效数据）+2（校验）=8	
                 // 1.填充四字节帧头
-                UART_Info->sendbuf[0 + i*8] = 0xAA;
-                UART_Info->sendbuf[1 + i*8] = 0xFF;
-                UART_Info->sendbuf[2 + i*8] = 0xF1;	
-                UART_Info->sendbuf[3 + i*8] = 2; //有效数据长度 8*4=32 8个导联?注释待更新?2023.1.30
+                g_UART_Info->sendbuf[0 + i*8] = 0xAA;
+                g_UART_Info->sendbuf[1 + i*8] = 0xFF;
+                g_UART_Info->sendbuf[2 + i*8] = 0xF1;	
+                g_UART_Info->sendbuf[3 + i*8] = 2; //有效数据长度 8*4=32 8个导联?注释待更新?2023.1.30
                 // 2.填充两字节MIC有效数据
                 // 搬移：队列缓冲区数据->发送缓冲区数据,每次搬2个U8
-                UART_Info->sendbuf[4 + i*8] = *(*(UART_Info->UART_Queue->databuf \
-                	+ UART_Info->UART_Queue->front)+1+i*2); //低位在前
-                UART_Info->sendbuf[5 + i*8]=*(*(UART_Info->UART_Queue->databuf \
-					+ UART_Info->UART_Queue->front)+0+i*2);
+                g_UART_Info->sendbuf[4 + i*8] = *(*(g_UART_Info->UART_Queue->databuf \
+                	+ g_UART_Info->UART_Queue->front)+1+i*2); //低位在前
+                g_UART_Info->sendbuf[5 + i*8]=*(*(g_UART_Info->UART_Queue->databuf \
+					+ g_UART_Info->UART_Queue->front)+0+i*2);
                 // 3.填充两字节校验位
                 sumcheck = 0;
                 addcheck = 0;
                 for (j = 0; j < 6 ;j++) {	// 对前6位进行校验
-                    sumcheck += UART_Info->sendbuf[j + i*8];	
+                    sumcheck += g_UART_Info->sendbuf[j + i*8];	
                     addcheck += sumcheck;					
                 }
-                UART_Info->sendbuf[6 + i*8] = sumcheck;	//校验		
-                UART_Info->sendbuf[7 + i*8] = addcheck;	//校验		
+                g_UART_Info->sendbuf[6 + i*8] = sumcheck;	//校验		
+                g_UART_Info->sendbuf[7 + i*8] = addcheck;	//校验		
             }
-            UART_Info->Queue_pop_flag = 1;
+            g_UART_Info->Queue_pop_flag = 1;
             //取数据，队头自增，存数据，队尾自增
-            UART_Info->UART_Queue->front = (UART_Info->UART_Queue->front+1) % UART_Info->UART_Queue->capacity;                       
+            g_UART_Info->UART_Queue->front = (g_UART_Info->UART_Queue->front+1) % g_UART_Info->UART_Queue->capacity;                       
         }
     }	
     TIM_ITConfig(TIM2, TIM_IT_Update, DISABLE);	//允许更新
     TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);	//禁止更新
-    QUEUE_Clear(UART_Info->UART_Queue);
+    QUEUE_Clear(g_UART_Info->UART_Queue);
     DMA_UART2_TX_NVIC_Config(DISABLE);
     g_Uart2DmaFinishFlag = 0;
 }
@@ -256,16 +257,16 @@ u8 NImingV7_Sendbuf_Init(void)
 {
     u16 i;    
     u8 datalength = 8;//一次采样要发送的数据长度
-    memset(UART_Info->sendbuf,0,UART_SEND_LENGTH);//清零
+    memset(g_UART_Info->sendbuf,0,UART_SEND_LENGTH);//清零
 
     //匿名上位机协议
-    for(i=0;i<100;i++) //一包N次采样 32 *8 =256字节
-    {		
+    //一包N次采样 32 *8 =256字节
+    for (i=0;i<100;i++) {		
         //帧头
-        UART_Info->sendbuf[0 + datalength*i] = 0xAA;
-        UART_Info->sendbuf[1 + datalength*i] = 0xFF;
-        UART_Info->sendbuf[2 + datalength*i] = 0xF1;
-        UART_Info->sendbuf[3 + datalength*i] = 2;//有效数据长度
+        g_UART_Info->sendbuf[0 + datalength*i] = 0xAA;
+        g_UART_Info->sendbuf[1 + datalength*i] = 0xFF;
+        g_UART_Info->sendbuf[2 + datalength*i] = 0xF1;
+        g_UART_Info->sendbuf[3 + datalength*i] = 2;//有效数据长度
     }	
     return  0;		
 }

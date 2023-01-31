@@ -27,9 +27,9 @@ extern volatile u16 ADCConvertedValue[ADCBUF_SIZE];//用来存放ADC转换结果，也是DM
 //_ADC_UNION  ADC_UNION;
 /////////////////////////////////////////////////////////////////////
 
-extern u16 BAT_VOL;
+extern u16 g_BatVol;
 extern u8 BAT_Percent;
-extern u8 LowPower_flag;
+extern u8 g_LowPowerFlag;
 extern u8 power_detective;
 
 

@@ -26,16 +26,17 @@
 #define UART_QUEUE_SIZE		100	//队列大小
 #define UART_SEND_LENGTH	160	//发送缓冲区  8*100
 
-__align(4) typedef struct {
+//__align(4) typedef struct {
+typedef struct {
     u16 datalength; 
     u8 *sendbuf;			//发送缓冲区
     //u8 *recbuf;			//接收缓冲区
     u32 datanumber; 
     u8 Queue_pop_flag;		//队列数据取出标志		1BYTE	
     QueueInfo *UART_Queue;	//队列缓冲区指针
-}_UART_Info;
+} UartInfoStru;
 
-extern  _UART_Info *UART_Info ; //上传数据结构
+extern UartInfoStru *g_UART_Info ; //上传数据结构
 //////////////////////////////////////////////////////////////////////////		
 extern u8 USART_RX_BUF[USART_REC_LEN] ;   //接收缓冲                         
 extern u16 USART_RX_STA;         		//接收状态标记	
@@ -54,8 +55,8 @@ extern u16 USART2_RX_EVENT;
 //extern u16 USART3_TIME;
 
 
-void uart1_init(u32 bound);
-void uart2_init(u32 bound);
+void UART1_Init(u32 bound);
+void UART2_Init(u32 bound);
 //void uart3_init(u32 bound);
 
 

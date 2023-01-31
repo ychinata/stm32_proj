@@ -18,7 +18,8 @@
 
 
 //循环队列 结构体声明	
-__align(4) typedef struct {	
+//__align(4) typedef struct {	
+typedef struct {	
     u8 Queue_Full_flag;
     u8 Queue_data_state;	//数据状态
     u32 front, rear;		//front指向队列头，rear为队列尾部

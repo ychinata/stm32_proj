@@ -18,7 +18,7 @@
 
 extern volatile u8 KeyMask; //°´¼ü±ê¼Ç
 extern volatile u8 KeyDat;
-extern u8 KEY_TYPE;
+extern u8 g_KeyType;
 
 
 void KEY_IO_Init(void);	

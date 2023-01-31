@@ -30,7 +30,7 @@ void HCO5_GPIO_Init(void)
 
 
 
-u8 HC05_SET_FLAG=0;
+u8 g_Hc05SetFlag=0;
 
 //蓝牙设置检测
 void HC05_SET(void)
@@ -43,7 +43,7 @@ void HC05_SET(void)
             ret++;
             if ( ret > 300 ) {//3s            
                 LED_2=LED_OFF;
-                HC05_SET_FLAG=1;//设置蓝牙
+                g_Hc05SetFlag = 1;//设置蓝牙
                 while( KEY1 == 0);
                         
                 return ;//退出函数

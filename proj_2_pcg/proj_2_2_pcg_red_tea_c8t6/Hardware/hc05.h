@@ -10,7 +10,7 @@
 
 
 #define HC05_UART   USART2
-#define HC05_uart_init(x)   uart2_init(x)
+#define HC05_uart_init(x)   UART2_Init(x)
 #define HC05_RX_LEN		USART2_RX_LEN
 #define HC05_RX_BUF		g_Usart2RxBuf
 #define HC05_CLEAR()  USART2_Clear()
@@ -35,7 +35,7 @@
 #define HC05_AT_RESET "AT+RESET\r\n"						//复位
 
 
-extern u8 HC05_SET_FLAG;//蓝牙设置标志
+extern u8 g_Hc05SetFlag;//蓝牙设置标志
 
 
 void HCO5_GPIO_Init(void);//上电引脚初始化

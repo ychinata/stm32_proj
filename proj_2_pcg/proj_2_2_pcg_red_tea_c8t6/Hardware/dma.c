@@ -14,28 +14,17 @@
 //版权所有，盗版必究。
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-
-u8 g_Uart1DmaFinishFlag;
+// 全局变量
 u8 g_Uart2DmaFinishFlag;
-u8 g_Uart3DmaFinishFlag;
-u8 g_Uart4DmaFinishFlag;
-
-u8 SPI1_DMA_Finish;
-u8 SPI2_DMA_Finish;
-u8 SPI3_DMA_Finish;
-
-u8 ADC_DMA_Finish;
 
 //DMA的各通道配置
 //这里的传输形式是固定的,这点要根据不同的情况来修改 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-// USART发送+DMA: DMA1_Channel7,外设(串口)是目的
+// USART发送+DMA: 使用DMA1_Channel7,外设(串口)是目的
 //从存储器->外设模式/8位数据宽度/存储器增量模式
-//DMA_CHx:DMA通道CHx
-//cpar:外设地址
-//cmar:内存地址
-void DMA_Config(DMA_Channel_TypeDef* DMA_CHx,u32 cpar,u32 cmar)
+//DMA_CHx:DMA通道CHx,cpar:外设地址,cmar:内存地址
+void DMA_UART_Config(DMA_Channel_TypeDef* DMA_CHx,u32 cpar,u32 cmar)
 {
     DMA_InitTypeDef DMA_InitStructure;	
 

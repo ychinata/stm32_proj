@@ -18,7 +18,7 @@ void KEY_IO_Init(void) //IO初始化
 
 volatile u8 KeyMask=0;//按键标记
 volatile u8 KeyDat=0;
-u8 KEY_TYPE=0;
+u8 g_KeyType=0;
 void Key_Scan(void)
 {
     if ( KEY1 ==0)//KEY按下
@@ -62,12 +62,12 @@ void Key_Scan(void)
             if(KeyMask==KEYSHORTDOWN )//短按键事件
             {				
                 KeyMask=KEYUNKNOW;//清变量		
-                KEY_TYPE		= KEYSHORTDOWN; 				
+                g_KeyType		= KEYSHORTDOWN; 				
             }					
             else if(KeyMask==KEYLONGDOWN)//长按键事件
             {					
                 KeyMask=KEYUNKNOW;//清变量
-                KEY_TYPE		= KEYLONGDOWN; 				
+                g_KeyType		= KEYLONGDOWN; 				
             }
         }		
     }

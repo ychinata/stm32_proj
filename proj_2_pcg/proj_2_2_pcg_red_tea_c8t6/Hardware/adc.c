@@ -34,9 +34,9 @@ STM32 ADC的时钟不要超过14MHz，否则转换精度会下降。
 
 volatile u16 ADCConvertedValue[ADCBUF_SIZE];//用来存放ADC转换结果，也是DMA的目标地址,3通道，每通道采集10次后面取平均数
 
-u16 BAT_VOL;
+u16 g_BatVol;	// 电池电压
 u8 BAT_Percent;
-u8 LowPower_flag;
+u8 g_LowPowerFlag;
 u8 power_detective;
 
 //设置ADC

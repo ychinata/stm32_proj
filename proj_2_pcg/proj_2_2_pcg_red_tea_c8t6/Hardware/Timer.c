@@ -123,12 +123,12 @@ void TIM3_Init(u16 arr,u16 psc)
     TIM_Cmd(TIM3,ENABLE);//使能
 }
 
-u8 TIM3_Timing=0;
+u8 g_TIM3_Timing = 0;
 //定时器中断服务程序	 
 void TIM3_IRQHandler(void)
 { 
     if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET) { //更新中断     
-        TIM3_Timing++;
+        g_TIM3_Timing++;
         DS1=!DS1;		
         TIM_ClearITPendingBit(TIM3, TIM_IT_Update);//清中断标志
     }     				   

@@ -18,10 +18,18 @@ UART_Info->sendbuf：
 3.DMA1_Channel1/DMA1_Channel7是如何决定的?-2023.1.30
 // USART发送+DMA: DMA1_Channel7,外设(串口)是目的
 // ADC+DMA:DMA1_Channel1,外设(传感器)是源
-
+4.为什么要使用2个串口
 
 
 TODO:
 1.DMA原理
 两个DMA控制器有12个通道(DMA1有7个通道，DMA2有5个通道)
 2.myquene.c待整理
+
+更名记录：
+UART_Info->g_UART_Info
+_UART_Info->UartInfoStru
+
+编译前修改：
+QueueInfo
+UartInfoStru
