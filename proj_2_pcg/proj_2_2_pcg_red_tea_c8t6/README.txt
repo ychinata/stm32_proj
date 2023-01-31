@@ -35,3 +35,7 @@ _UART_Info->UartInfoStru
 编译前修改回原状align(align会导致SI不识别)：
 QueueInfo
 UartInfoStru
+
+【遗留问题】
+
+

@@ -41,10 +41,10 @@ void HC05_SET(void)
         while( KEY1 == 0) {       
             delay_ms(10);
             ret++;
-            if ( ret > 300 ) {//3s            
+            if ( ret > 300 ) {		//摁下3s            
                 LED_2=LED_OFF;
-                g_Hc05SetFlag = 1;//设置蓝牙
-                while( KEY1 == 0);
+                g_Hc05SetFlag = 1;	//设置蓝牙
+                while( KEY1 == 0);	// 等待松开按键
                         
                 return ;//退出函数
             }

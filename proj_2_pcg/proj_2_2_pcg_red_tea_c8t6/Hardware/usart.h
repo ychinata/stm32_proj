@@ -34,7 +34,7 @@ typedef struct {
     u8 *sendbuf;			//发送缓冲区
     //u8 *recbuf;			//接收缓冲区
     u32 datanumber; 
-    u8 Queue_pop_flag;		//队列数据取出标志		1BYTE	
+    u8 Queue_pop_flag;		//队列数据取出标志		1BYTE,1为可取出,0为不可取出
     QueueInfo *UART_Queue;	//队列缓冲区指针
 } UartInfoStru;
 

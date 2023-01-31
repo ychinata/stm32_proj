@@ -166,10 +166,10 @@ s8 QUEUE_Push(QueueInfo *q, u8 *cache,u16 length)
     //队列满了
     if ((q->rear+1) % q->capacity == q->front) {
         q->front = (q->front+1) % q->capacity;//队头自增，删除最先进入的数据
-        q->Queue_Full_flag=1; //队列空标志
+        q->Queue_Full_flag=1; //队列满
         //return 0;//满了
     } else {
-        q->Queue_Full_flag=0; //队列空标志
+        q->Queue_Full_flag=0; //队列未满
     }
     memcpy( *(q->databuf + q->rear),cache,length);//搬运  N 个字节			
 
@@ -214,7 +214,7 @@ s8 QUEUE_Clear(QueueInfo *q)
 		return -1; //need queue
     q->carry_num=0;
     q->front = q->rear = 0; //初始化时，将front与rear都置为0。
-    q->Queue_Full_flag=0; //队列空标志
+    q->Queue_Full_flag=0; //队列未满
 
 	//队列容量
     for (i=0;i<q->capacity;i++) {		

@@ -45,10 +45,12 @@ int main(void)
     HCO5_GPIO_Init();
     UART1_Init(460800);//串口初始化
     OLED_Init();
-    
+    // debug
 	OLED_ShowString(1, 1, "PCG Demo:");	// 在1行1列显示
+	OLED_ShowString(2, 1, "AD0:");
+    OLED_ShowString(3, 1, "debug setp:");
     Main_printf("开机\r\n");
-    Main_printf("STM32F103C8T6单通道心音采集   V0.1 2023-1-30\r\n");	
+    Main_printf("STM32F103C8T6单通道心音采集V0.1 2023-1-30\r\n");	
 
     LED1 = LED_ON;	
     LED2 = LED_ON;
@@ -66,6 +68,8 @@ int main(void)
     ADC1_Init();
     DMA_ADC_Config(g_ADCConvertedValue, 3);
     Main_printf("DMA ADC 初始化完成\r\n");
+    //debug
+    OLED_ShowString(3, 12, "2");
 
 	// 串口数据申请内存
     g_UART_Info = (UartInfoStru*)mymalloc(SRAMIN, sizeof(UartInfoStru)); //队列结构
@@ -77,9 +81,11 @@ int main(void)
         Main_printf("串口缓存,内存申请成功\r\n");
     }
     Main_printf("内存当前占用 %d\r\n", mem_perused(SRAMIN));
+    //debug
+    OLED_ShowString(3, 12, "3");    
 
 	// 启动循环任务
-    while(1) {
+    while(1) {				
         Send_BlueTooth();
     }
 }	
@@ -97,10 +103,14 @@ void Send_BlueTooth(void)
     TIM3_Init(3000,7200);	//WIFI设置检测
     g_TIM3_Timing = 0;
     g_Hc05SetFlag = 0;
+    //debug
+    OLED_ShowString(3, 12, "4");    
     while(g_Hc05SetFlag==0 && g_TIM3_Timing<10)	//等待3s
         HC05_SET();//检测蓝牙按键	
-    if (g_Hc05SetFlag) {	//配网
-        res=HCO5_AT_Confg();//开始设置		
+    //debug
+    OLED_ShowString(3, 12, "5");    
+    if (g_Hc05SetFlag) {	// 如果用户进行配网
+        res=HCO5_AT_Confg();// 开始设置		
         if(res)		
             Main_printf("蓝牙设置失败\r\n");							
         else									
@@ -111,7 +121,9 @@ void Send_BlueTooth(void)
         TIM_Cmd(TIM3, DISABLE); 	
         SoftReset();				
     }
-
+    //debug
+    OLED_ShowString(3, 12, "6");
+    
     Main_printf("开启蓝牙串口及DMA中断\r\n");
     HC05_ON;//开蓝牙		
     HC05_uart_init(460800);//串口初始化 HC05串口
@@ -131,7 +143,9 @@ void Send_BlueTooth(void)
     g_LowPowerFlag = 0;
     g_TIM3_Timing = 0;
     TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);//允许更新
-    DMA_ADC_NVIC_Config(ENABLE);//开启DMA ADC中断			
+    DMA_ADC_NVIC_Config(ENABLE);//开启DMA ADC中断		
+    //debug
+    OLED_ShowString(3, 12, "7");    
 
     while(1) {	
         Key_Scan();//按键检测
@@ -140,11 +154,18 @@ void Send_BlueTooth(void)
             break;
         }
 
+		//debug
+		OLED_ShowString(3, 12, "8");
+
+		//debug
+		OLED_ShowNum(2, 5, g_ADCConvertedValue[0], 4);
+	    delay_ms(100);		
+
         // 电池电量监测
         if(g_TIM3_Timing == 10) {	
             g_TIM3_Timing = 0;
             g_BatVol = (u16)((float)g_ADCConvertedValue[1] / g_ADCConvertedValue[2]*1200)*2;
-            Main_printf("Bat Voltage %d mV ",g_BatVol);			
+            Main_printf("Bat Voltage %d mV\r\n",g_BatVol);			
             if (g_LowPowerFlag==0){
                 if (g_BatVol<3200) {//低电量报警
                     g_LowPowerFlag= 1;
@@ -166,6 +187,9 @@ void Send_BlueTooth(void)
             }
         }
 
+		//debug
+		OLED_ShowString(3, 12, "9");
+
         // 串口数据接收(修改ADC采样率)
         if (USART2_RX_EVENT) { 				
             if (g_Uart2DmaFinishFlag == 0) { //串口未被占用						
@@ -182,6 +206,8 @@ void Send_BlueTooth(void)
             }
         }
 
+		//debug
+		OLED_ShowString(3, 12, "A");
 
         // 队列数据取出标志
         if (g_UART_Info->Queue_pop_flag == 1) {	
@@ -194,8 +220,8 @@ void Send_BlueTooth(void)
                 Main_printf("f ");
             }
         } else if (QUEUE_SearchData(g_UART_Info->UART_Queue)) {	//若队列有数据
-        	// 一帧100次采样的数据
-            for (i = 0; i < 20; i++) { // 20帧长?
+        	// 一帧20次采样的数据,填充发送缓冲区
+            for (i = 0; i < 20; i++) {
                 //帧1数据长度为8字节		4（帧头）+2（有效数据）+2（校验）=8	
                 // 1.填充四字节帧头
                 g_UART_Info->sendbuf[0 + i*8] = 0xAA;
@@ -223,6 +249,9 @@ void Send_BlueTooth(void)
             g_UART_Info->UART_Queue->front = (g_UART_Info->UART_Queue->front+1) % g_UART_Info->UART_Queue->capacity;                       
         }
     }	
+    //debug
+    OLED_ShowString(3, 12, "B");	
+	
     TIM_ITConfig(TIM2, TIM_IT_Update, DISABLE);	//允许更新
     TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);	//禁止更新
     QUEUE_Clear(g_UART_Info->UART_Queue);
