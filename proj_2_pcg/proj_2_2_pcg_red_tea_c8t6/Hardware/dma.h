@@ -4,6 +4,7 @@
 
 
 extern u8 g_Uart2DmaFinishFlag;
+extern u8 g_AdcDmaFinishFlag;
 
 //´®¿ÚDMA
 void DMA_UART_Config(DMA_Channel_TypeDef* DMA_CHx,u32 cpar,u32 cmar);

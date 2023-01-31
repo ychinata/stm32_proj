@@ -18,13 +18,15 @@
 #endif
 //////////////////////////////////////////////////////////////////////////
 ////wifi
+//1帧100个采样?
 //#define UART_QUEUE_LENGTH	200	//（队列容量）100次采样 2*100=200  
 //#define UART_QUEUE_SIZE	30	//队列大小
 //#define UART_SEND_LENGTH	800	//发送缓冲区  8*100
 //蓝牙
+//1帧20个采样?
 #define UART_QUEUE_LENGTH	40	//（队列容量）20次采样 2*20=40  
 #define UART_QUEUE_SIZE		100	//队列大小
-#define UART_SEND_LENGTH	160	//发送缓冲区  8*100
+#define UART_SEND_LENGTH	160	//发送缓冲区  8*20
 
 //__align(4) typedef struct {
 typedef struct {

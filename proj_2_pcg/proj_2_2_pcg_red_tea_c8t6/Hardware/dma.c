@@ -16,6 +16,7 @@
 
 // 全局变量
 u8 g_Uart2DmaFinishFlag;
+u8 g_AdcDmaFinishFlag;
 
 //DMA的各通道配置
 //这里的传输形式是固定的,这点要根据不同的情况来修改 
@@ -24,6 +25,7 @@ u8 g_Uart2DmaFinishFlag;
 // USART发送+DMA: 使用DMA1_Channel7,外设(串口)是目的
 //从存储器->外设模式/8位数据宽度/存储器增量模式
 //DMA_CHx:DMA通道CHx,cpar:外设地址,cmar:内存地址
+// DMA_CHx是否写死为DMA1_Channel7,没必要设置入参
 void DMA_UART_Config(DMA_Channel_TypeDef* DMA_CHx,u32 cpar,u32 cmar)
 {
     DMA_InitTypeDef DMA_InitStructure;	
@@ -122,5 +124,73 @@ void DMA_ADC_NVIC_Config(u8 cmd)
     }
 }
 
+
+//DMA-ADC1中断函数
+// 20次这个应该定义成宏,与Send_BlueTooth中的统一?2023.1.31
+u8 cache[2];
+void DMA1_Channel1_IRQHandler()  
+{  
+	if (DMA_GetITStatus(DMA1_IT_TC1)) {                  	//判断DMA传输完成中断    
+		g_AdcDmaFinishFlag = 1;                         	//置采样完成标志位  
+		
+		cache[0] = g_ADCConvertedValue[0] >> 8;
+		cache[1] = g_ADCConvertedValue[0];			
+		//搬运数据至队列,将ADC采样的数据搬运至UART2,准备串口发送
+		QUEUE_DataPush(g_UART_Info->UART_Queue, cache, 2, 20);	
+
+       	DMA_ClearITPendingBit(DMA1_IT_TC1);            		//清除DMA中断标志位
+    } 		
+}
+
+//DMA-USART2_TX中断函数
+void DMA1_Channel7_IRQHandler() 
+{  
+	if (DMA_GetITStatus(DMA1_IT_TC7)) {		//发送完成中断 	
+		g_Uart2DmaFinishFlag = 0;			//置采样完成标志位  
+		DMA_Cmd(DMA1_Channel7, DISABLE );  	//关闭当前的DMA传输
+		DMA_ClearFlag(DMA1_FLAG_TC7);   	//清除DMA完成标志
+		DMA_ClearITPendingBit(DMA1_IT_TC7);	//清除DMA中断标志位
+	}	
+}
+
 ///////////////////////////////////////以下删除废弃代码
+//u8 SPI1_DMA_Config(void)
+//u8 SPI2_DMA_Config(void)
+//u8 SPI3_DMA_Config(void)
+////启动DMA传输 启用中断
+//u8 SPI1_DMA_TX(u8 *buffer,u16 len)
+//u8 SPI1_DMA_RX(u8 *buffer,u16 len)
+//u8 SPI2_DMA_TX(u8 *buffer,u16 len)
+//u8 SPI2_DMA_RX(u8 *buffer,u16 len)
+
+////初始化DMA中断 cmd 1 使能
+//void SPI1_DMA_NVIC_Config(u8 cmd)
+////初始化DMA中断 cmd 1 使能
+//void SPI2_DMA_NVIC_Config(u8 cmd)
+////初始化DMA中断 cmd 1 使能
+//void SPI3_DMA_NVIC_Config(u8 cmd)
+
+//ADC1
+//void DMA1_Channel1_IRQHandler()  
+////SPI1_RX/U3_TX
+//void DMA1_Channel2_IRQHandler()  
+////SPI1_TX/U3_RX
+//void DMA1_Channel3_IRQHandler()  
+//SPI2_RX/U1_TX
+//void DMA1_Channel4_IRQHandler() 
+//void DMA1_Channel5_IRQHandler() 
+//void DMA1_Channel6_IRQHandler() 
+//U2_TX
+//void DMA1_Channel7_IRQHandler() 
+//SPI3_RX
+//void DMA2_Channel1_IRQHandler() 
+////SPI3_TX
+//void DMA2_Channel2_IRQHandler() 
+//U4_RX
+//void DMA2_Channel3_IRQHandler() 
+//cannle4 
+//cannle5 U4_TX
+//void DMA2_Channel4_5_IRQHandler() 
+
+
 
