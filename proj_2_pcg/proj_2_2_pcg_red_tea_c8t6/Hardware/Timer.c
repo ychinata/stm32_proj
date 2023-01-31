@@ -138,7 +138,7 @@ void TIM4_Init(u16 arr,u16 psc)
 {    
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;  
     TIM_OCInitTypeDef TIM_OCInitStructure;	
-    NVIC_InitTypeDef NVIC_InitStructure;  
+    // 无需配置中断     NVIC_InitStructure, 也无需对应的中断函数?
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE); 
                             
@@ -155,49 +155,13 @@ void TIM4_Init(u16 arr,u16 psc)
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;//如果是PWM1要为Low，PWM2则为High
     TIM_OC4Init(TIM4, & TIM_OCInitStructure);
 
-    //		NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);              //组别		
-    //		NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;              //TIM6中断
-    //		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;    //设置抢占优先级
-    //		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;           //设置响应优先级
-    //		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;              //中断使能	
-    //		NVIC_Init(&NVIC_InitStructure);                              //按照指定参数初始化中断
-    //		
-    //		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);                  //清中断	
-    //		TIM_ITConfig(TIM4, TIM_IT_Update, DISABLE);                   //定时器中断使能
-
     TIM_Cmd(TIM4, ENABLE);                                       //定时器使能 	
-
     TIM_CtrlPWMOutputs(TIM4,ENABLE);
 } 
-
-
-
-//u8 TIM4_Flag=0;
-//void TIM4_IRQHandler(void)  
-//{  	
-//		u8 cache[4];
-//    //更新中断
-//    if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)   //更新中断
-//    {  
-//				ADC_UNION1.ADC_buf=ADCConvertedValue[0]; //通道0
-//				ADC_UNION2.ADC_buf=ADCConvertedValue[1]; //通道1
-//			
-//				cache[0]=ADC_UNION1.adc_buf[0];
-//				cache[1]=ADC_UNION1.adc_buf[1];
-//				cache[2]=ADC_UNION2.adc_buf[0];
-//				cache[3]=ADC_UNION2.adc_buf[1];
-//			
-//				QUEUE_DataPush(UART_Info->UART_Queue,cache,4,32);//搬运数据至队列
-//			
-//    		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);//清中断标志
-//		}        
-//}
-
-
-
  
 //		TIM3->CNT=0;//清空定时器计数器
 //		TIM3->ARR=arr;  	//设定计数器自动重装值//刚好1ms    
 //		TIM3->PSC=psc;  	//预分频器7200,得到10Khz的计数时钟		  
 //		TIM3->DIER|=1<<0;   //允许更新中断	  
 //		TIM3->CR1|=0x01;    //使能定时器3
+

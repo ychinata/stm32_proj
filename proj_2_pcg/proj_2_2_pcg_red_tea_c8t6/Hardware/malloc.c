@@ -39,6 +39,7 @@ struct _m_mallco_dev mallco_dev=
 	mem1mapbase,//内存管理状态表
 	0,  		 					//内存管理未就绪
 };
+	
 ////内存管理参数	   
 //const u32 memtblsize[SRAMBANK]={MEM1_ALLOC_TABLE_SIZE,MEM2_ALLOC_TABLE_SIZE,MEM3_ALLOC_TABLE_SIZE};	//内存表大小
 //const u32 memblksize[SRAMBANK]={MEM1_BLOCK_SIZE,MEM2_BLOCK_SIZE,MEM3_BLOCK_SIZE};					//内存分块大小
@@ -74,6 +75,7 @@ void mymemset(void *s,u8 c,u32 count)
     u8 *xs = s;  
     while(count--)*xs++=c;  
 }	   
+
 //内存管理初始化  
 //memx:所属内存块
 void mem_init(u8 memx)  
@@ -82,6 +84,7 @@ void mem_init(u8 memx)
 		mymemset(mallco_dev.membase[memx], 0,memsize[memx]);	//内存池所有数据清零  
 		mallco_dev.memrdy[memx]=1;								//内存管理初始化OK  
 }  
+
 //获取内存使用率
 //memx:所属内存块
 //返回值:使用率(0~100)
@@ -95,6 +98,7 @@ u8 mem_perused(u8 memx)
     } 
     return (used*100)/(memtblsize[memx]);  
 }  
+
 //内存分配(内部调用)
 //memx:所属内存块
 //size:要分配的内存大小(字节)
@@ -124,6 +128,7 @@ u32 my_mem_malloc(u8 memx,u32 size)
     }  
     return 0XFFFFFFFF;//未找到符合分配条件的内存块  
 }  
+
 //释放内存(内部调用) 
 //memx:所属内存块
 //offset:内存地址偏移
@@ -147,6 +152,7 @@ u8 my_mem_free(u8 memx,u32 offset)
         return 0;  
     }else return 2;//偏移超区了.  
 }  
+
 //释放内存(外部调用) 
 //memx:所属内存块
 //ptr:内存首地址 
@@ -157,6 +163,7 @@ void myfree(u8 memx,void *ptr)
     offset=(u32)ptr-(u32)mallco_dev.membase[memx];     
     my_mem_free(memx,offset);	//释放内存      
 }  
+
 //分配内存(外部调用)
 //memx:所属内存块
 //size:内存大小(字节)
@@ -189,9 +196,6 @@ void *mymalloc(u8 memx,u32 size)
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
-
 /*
 		void * 的作用
 　　C语言中void * 为 “不确定类型指针”，void *可以用来声明指针。如：void * a；
@@ -204,12 +208,8 @@ void *mymalloc(u8 memx,u32 size)
 　　　　int * a = NULL ；
   　　　void * b ；
 　　　　a  =  （int *）b；
-　　	 但是有意思的是：void* 在转换为其他数据类型时，赋值给void* 的类型 和目标类型必须保持一致。简单点来说：void* 类型接受了int * 的赋值后 这个void * 不能转化为其他类型，必须转换为int *类型；
+　	但是有意思的是：void* 在转换为其他数据类型时，赋值给void* 的类型 和目标类型必须保持一致。
+	简单点来说：void* 类型接受了int * 的赋值后 这个void * 不能转化为其他类型，必须转换为int *类型；
 */
-
-
-
-
-
 
 

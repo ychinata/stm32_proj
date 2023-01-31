@@ -579,11 +579,6 @@
               <FilePath>..\Hardware\adc.c</FilePath>
             </File>
             <File>
-              <FileName>ESP8266.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\ESP8266.c</FilePath>
-            </File>
-            <File>
               <FileName>malloc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Hardware\malloc.c</FilePath>

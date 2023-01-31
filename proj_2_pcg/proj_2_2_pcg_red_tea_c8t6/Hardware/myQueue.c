@@ -126,7 +126,6 @@ u8 QUEUE_Deinit(QueueInfo *q)//循环队列注销
 //注意判断队列为空还是满，并且保证其不大于capacity。
 s8 QUEUE_PushByte(QueueInfo *q, u8 byte) 
 {	
-    u16 i;
     if (q==NULL) 
 		return -1; // need queue
 	//队列满了	
@@ -144,7 +143,6 @@ s8 QUEUE_PushByte(QueueInfo *q, u8 byte)
 //注意判断队列为空还是满，并且保证其不大于capacity。
 s8 QUEUE_Add(QueueInfo *q, u8 *cache,u8 add,u8 length) 
 {	
-    u16 i;
     if (q==NULL) 
 		return -1; // need queue
 	//队列满了	
@@ -163,7 +161,6 @@ s8 QUEUE_Add(QueueInfo *q, u8 *cache,u8 add,u8 length)
 //注意判断队列为空还是满，并且保证其不大于capacity。
 s8 QUEUE_Push(QueueInfo *q, u8 *cache,u16 length) 
 {	
-    u16 i;
     if (q==NULL) 
 		return -1; // need queue
     //队列满了
@@ -180,27 +177,6 @@ s8 QUEUE_Push(QueueInfo *q, u8 *cache,u16 length)
     return 1;    // return push count 		
 }
 
-////注意这里没有增加队头，需要外部增加，特点情况下使用
-//s8 queue_push2(QueueInfo *q, u8 *cache,u16 length) 
-//{	
-//		u16 i;
-//    if (q==NULL) return -1; // need queue
-//    if ((q->rear+1) % q->capacity == q->front) //队列满了
-//		{
-//				q->front = (q->front+1) % q->capacity;//队头自增，删除最先进入的数据	
-//				q->Queue_Full_flag=1; //队列空标志
-//				//return 0;//满了
-//		}
-//		else
-//		{
-//				q->Queue_Full_flag=0; //队列空标志
-//		}
-//		memcpy( *(q->databuf + q->rear),cache,length);//搬运  N 个字节			
-
-//    //q->rear = (q->rear+1) % q->capacity; //取数据，队头自增，存数据，队尾自增	
-//    return 1;    // return push count 		
-//}
-
 
 //从数组的后端移除项
 //队列取数据
@@ -214,17 +190,6 @@ s8 QUEUE_Pop(QueueInfo *q,u8 *sendbuf,u16 length)//从队列搬运 n个字节 至发送缓冲
     q->front = (q->front+1) % q->capacity;//取数据，队头自增，存数据，队尾自增
     return 1; //取到数据
 }
-//////队列第一个字节是数据长度，这里跳过了第一个字节，特点情况下使用
-////s8 QUEUE_Pop(QueueInfo *q,u8 *sendbuf,u16 length)//从队列搬运 n个字节 至发送缓冲区
-////{	
-////	  if (q==NULL) return -1; // need queue
-////	  if (q->front==q->rear) return 0;//队列为空
-////	
-////		memcpy(sendbuf,*(q->databuf + q->front)+1,length);//copy n 个字节
-////	
-////    q->front = (q->front+1) % q->capacity;//取数据，队头自增，存数据，队尾自增
-////    return 1; //取到数据
-////}
 
 
 //检测队列是否有数据
@@ -263,7 +228,6 @@ s8 QUEUE_Clear(QueueInfo *q)
 //参数：队列指针，数据来源，要搬运的数据长度，要搬运的次数
 s8 QUEUE_DataPush(QueueInfo *q, u8 *cache,u8 length,u16 times) 
 {	
-    u16 i;
     if (q==NULL) return -1; // need queue
     //队列满了
     if ((q->rear+1) % q->capacity == q->front) {

@@ -3,10 +3,6 @@
 #include "led.h"
 
 
-
-
-
-
 //按键及电源控制初始化
 void KEY_IO_Init(void) //IO初始化
 { 

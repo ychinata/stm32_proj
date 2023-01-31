@@ -6,8 +6,6 @@
 ////////////////////////////////////////////////////////////////////////// 
 _UART_Info *UART_Info ; //数据结构
 
-
-
 void uart1_init(u32 bound)
 {
 	//GPIO端口设置
@@ -83,31 +81,6 @@ void USART1_IRQHandler(void)                	//串口1中断服务程序
 		}   		 
     } 
 } 
-
-////串口1缓冲区
-//u8 USART1_RX_BUF[USART_REC_LEN] ;           
-//u8 USART1_TX_BUF[USART_REC_LEN] ; 
-//u16 USART1_RX_LEN;
-//u16 USART1_TIME;
-//u8 USART1_RX_EVENT;
-////****************************************************************************** 
-////串口1中断程序       
-////******************************************************************************
-//void USART1_IRQHandler(void)  
-//{
-//		u8 Res;
-//		if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
-//		{
-//				USART1_TIME=0;
-
-//				Res = USART_ReceiveData(USART1);	//读取接收到的数据
-//				USART1_RX_BUF[USART1_RX_LEN] = Res;
-//				USART1_RX_LEN++;
-//				if(USART1_RX_LEN == USART_REC_LEN)
-//					USART1_RX_LEN=0;
-//		}   		 
-//}
-	
 
 
 //******************************************************************************              
@@ -186,79 +159,7 @@ void USART2_IRQHandler(void)
 	}   		 
 } 
 
-
-
-//void uart3_init(u32 bound)
-//{
-//		GPIO_InitTypeDef GPIO_InitStructure;   //声明一个结构体变量，用来初始化GPIO
-//  	USART_InitTypeDef USART_InitStructure;   //串口结构体定义
-//		NVIC_InitTypeDef NVIC_InitStructure;  //中断结构体定义
-// 
-//  	//开启GPIOA，USART3 时钟
-//		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB|RCC_APB2Periph_AFIO , ENABLE);  
-//		RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-//  	
-//		//配置GPIO的模式和IO口 TX     
-//  	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;          //串口输出                                                                                        
-//  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;   
-//  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;    //复用推挽输出
-//  	GPIO_Init(GPIOB,&GPIO_InitStructure);              //初始化串口输入
-//		//RX
-//  	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;          //串口输入                                                                         
-//  	GPIO_InitStructure.GPIO_Mode =  GPIO_Mode_IN_FLOATING;//浮空输入
-//  	GPIO_Init(GPIOB,&GPIO_InitStructure);       			 //初始化串口输出
-//					
-//		//串口配置//设置通信波特率		
-//		USART_InitStructure.USART_BaudRate = bound;                    ////波特率
-//		USART_InitStructure.USART_WordLength = USART_WordLength_8b;   ////数据长8位
-//		USART_InitStructure.USART_StopBits = USART_StopBits_1;        ////1位停止位
-//		USART_InitStructure.USART_Parity = USART_Parity_No;           ////无效验
-//  	USART_InitStructure.USART_HardwareFlowControl =  USART_HardwareFlowControl_None; //设置硬件流控制失能
-//  	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;                  //设置发送使能，接收使能	
-//		USART_Init(USART3, &USART_InitStructure);      			//USART_Init初始化                                                                                      
-//			
-//		//NVIC 配置
-//		NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);             //设置中断优先级分组
-//  	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;           //打开USART2的全局中断
-//		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;   //抢占优先级为1
-//  	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;          //响应优先级为2
-//  	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;             //使能
-//  	NVIC_Init(&NVIC_InitStructure);
-//  	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE); 			//串口接收中断 
-//		
-//  	USART_Cmd(USART3, ENABLE);                     			//使能USART     
-//} 
-
-
-
-////串口3缓冲区
-//u8 USART3_RX_BUF[USART_REC_LEN] ;           
-//u8 USART3_TX_BUF[USART_REC_LEN] ; 
-//u16 USART3_RX_LEN;
-//u16 USART3_TIME;
-////****************************************************************************** 
-////串口3中断程序       
-////******************************************************************************
-//void USART3_IRQHandler(void)  
-//{
-//		u8 Res;
-//		if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
-//		{
-//				USART3_TIME=0;
-
-//				Res = USART_ReceiveData(USART3);	//读取接收到的数据	
-//				USART3_RX_BUF[USART3_RX_LEN] = Res;
-//				USART3_RX_LEN++;
-//				if(USART3_RX_LEN == USART_REC_LEN)
-//					USART3_RX_LEN=0;
-//		}   		 
-//} 
-
-
-
-
-
-
+// 删除uart3_init,USART3_IRQHandler
 
 //串口缓冲清零
 void USART2_Clear(void)
@@ -281,42 +182,7 @@ void USARTx_Send(USART_TypeDef* USARTx, u8 *Data, u8 Len)
     }  
 } 
 
-
-
-////串口2,printf 函数
-////确保一次发送数据不超过USART3_MAX_SEND_LEN字节
-//void u2_printf(char* fmt,...)  
-//{ 
-//	u16 i,j; 
-//	va_list ap; 
-//	va_start(ap,fmt);
-//	vsprintf((char*)g_Usart2TxBuf,fmt,ap);
-//	va_end(ap);
-//	i=strlen((const char*)g_Usart2TxBuf);		//此次发送数据的长度
-//	for(j=0;j<i;j++)							//循环发送数据
-//	{
-//	  while(USART_GetFlagStatus(USART2,USART_FLAG_TC)==RESET); //循环发送,直到发送完毕   
-//		USART_SendData(USART2,g_Usart2TxBuf[j]); 
-//	} 
-//}
-////串口3,printf 函数
-////确保一次发送数据不超过USART3_MAX_SEND_LEN字节
-//void u3_printf(char* fmt,...)  
-//{ 
-//	u16 i,j; 
-//	va_list ap; 
-//	va_start(ap,fmt);
-//	vsprintf((char*)USART3_TX_BUF,fmt,ap);
-//	va_end(ap);
-//	i=strlen((const char*)USART3_TX_BUF);		//此次发送数据的长度
-//	for(j=0;j<i;j++)							//循环发送数据
-//	{
-//	  while(USART_GetFlagStatus(USART3,USART_FLAG_TC)==RESET); //循环发送,直到发送完毕   
-//		USART_SendData(USART3,USART3_TX_BUF[j]); 
-//	} 
-//}
-
-
+//// 删除u2_printf,u3_printf
 
 //判断指定字符串是否在数组中
 //返回-1 没有指定的串
@@ -409,3 +275,4 @@ int GetKey (void)  {
 
     return ((int)(USART1->DR & 0x1FF));
 }
+

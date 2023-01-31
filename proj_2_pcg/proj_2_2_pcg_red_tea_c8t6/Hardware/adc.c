@@ -61,28 +61,22 @@ void ADC1_Init(void)
 
     ADC_DeInit(ADC1);//复位ADC1，设为缺省值
 
-
     ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;     //独立模式
-    //ADC_InitStructure.ADC_Mode = ADC_Mode_RegSimult;     //ADC同步 1 2 DMA用
-
-    //ADC_InitStructure.ADC_ScanConvMode = DISABLE; //数模转换：扫描（多通道）模式=ENABLE  单次（单通道）模式=DISABLE
-    ADC_InitStructure.ADC_ScanConvMode = ENABLE; //数模转换：扫描（多通道）模式=ENABLE  单次（单通道）模式=DISABLE
-    
+    ADC_InitStructure.ADC_ScanConvMode = ENABLE; //数模转换：扫描（多通道）模式=ENABLE,   单次（单通道）模式=DISABLE    
     ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;     //连续执行还是单次执行 定时器触发需要关闭
-    //ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;  //DISABLE单通道模式，enable多通道扫描模式 
-
-    //ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;   //触发方式 软件
-    ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T4_CC4;   //触发方式 定时器4 CC4
-
-    ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;   //数据右对齐
-    ADC_InitStructure.ADC_NbrOfChannel = 3;                 //顺序进行规则转换的通道数  
+    														//DISABLE单通道模式，enable多通道扫描模式 
+    ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T4_CC4;   //触发方式 定时器4 CC4,查看TIM4_Init
+    //ADC_ExternalTrigConv_None为软件触发
+    ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;  // 数据右对齐
+    ADC_InitStructure.ADC_NbrOfChannel = 3;                 // 顺序进行规则转换的通道数  
     ADC_Init(ADC1, &ADC_InitStructure);
 
 
     //设置指定ADC的规则组通道，设置它们的转化顺序和采样时间
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_239Cycles5 );
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_9, 2, ADC_SampleTime_239Cycles5 );
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_17, 3, ADC_SampleTime_239Cycles5 );
+    // C8T6:PA0-7,PB0-1
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_239Cycles5 );	// ADC_MIC接PA7
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_9, 2, ADC_SampleTime_239Cycles5 );	// BAT接PB1-2023.1.31
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_17, 3, ADC_SampleTime_239Cycles5 );	// C8T6有没有?
 
     ADC_DMACmd(ADC1, ENABLE);//开启DMA ADC采集
     ADC_Cmd(ADC1,ENABLE);
@@ -97,29 +91,5 @@ void ADC1_Init(void)
     ADC_TempSensorVrefintCmd(ENABLE); //开启内部参考电压 1.2V 使用内部参考电压计算电量百分比
 }
 
-
-////获得 ADC 值
-////ch:通道值
-//u16 Get_Adc(u8 ch)
-//{
-//		ADC_SoftwareStartConvCmd(ADC1, ENABLE); //使能软件转换功能
-//		while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC ));//等待转换结束
-//		return ADC_GetConversionValue(ADC1); //返回最近一次 ADC1 规则组的转换结果
-//}
-
-
-//u16 Get_Adc_Average(u8 ch,u8 times)
-//{
-//		u32 temp_val=0;
-//		u8 t;
-//		for(t=0;t<times;t++)
-//		{ 
-//				temp_val+=Get_Adc(ch);
-//				delay_ms(5);
-//		}
-//		return temp_val/times;
-//}
-
-
-
+// 如果不使用DMA+ADC, 则使用Get_Adc和Get_Adc_Average(代码删除)
 

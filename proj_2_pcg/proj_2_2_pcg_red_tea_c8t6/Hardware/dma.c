@@ -26,10 +26,11 @@ u8 SPI3_DMA_Finish;
 
 u8 ADC_DMA_Finish;
 
- 
-/////////////////////////////////////////////////////////////////////////////////////////////
 //DMA的各通道配置
-//这里的传输形式是固定的,这点要根据不同的情况来修改
+//这里的传输形式是固定的,这点要根据不同的情况来修改 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+// USART发送+DMA: DMA1_Channel7,外设(串口)是目的
 //从存储器->外设模式/8位数据宽度/存储器增量模式
 //DMA_CHx:DMA通道CHx
 //cpar:外设地址
@@ -82,17 +83,13 @@ void DMA_UART2_TX_NVIC_Config(u8 cmd)
 		
     if(cmd == ENABLE) {
         DMA_ITConfig(DMA1_Channel7,DMA_IT_TC,ENABLE); //传输完成中断
-        //DMA_ITConfig(DMA1_Channel4,DMA_IT_HT,ENABLE);  //半发送中断
-        //DMA_ITConfig(DMA1_Channel4,DMA_IT_TE,ENABLE);  //发送错误中断
     } else {
         DMA_ITConfig(DMA1_Channel7,DMA_IT_TC,DISABLE); //传输完成中断
-        //DMA_ITConfig(DMA1_Channel4,DMA_IT_HT,ENABLE);  //半发送中断
-        //DMA_ITConfig(DMA1_Channel4,DMA_IT_TE,ENABLE);  //发送错误中断
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-//初始化ADC DMA
+// ADC+DMA:DMA1_Channel1,外设(传感器)是源
 //单路ADC-删除
 //多路ADC
 void DMA_ADC_Config(u16 *buffer, u16 len)
@@ -111,7 +108,7 @@ void DMA_ADC_Config(u16 *buffer, u16 len)
     DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;//数据宽度为16位
     DMA_InitStructure.DMA_Mode = DMA_Mode_Circular; //工作在循环缓存模式
     DMA_InitStructure.DMA_Priority = DMA_Priority_High;//DMA通道拥有高优先级 分别4个等级 低、中、高、非常高
-    DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;//使能DMA通道的内存到内存传输
+    DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;//DMA通道x没有设置为内存到内存传输
     DMA_Init(DMA1_Channel1, &DMA_InitStructure);//根据DMA_InitStruct中指定的参数初始化DMA的通道
 			
     DMA_Cmd(DMA1_Channel1, ENABLE);
@@ -131,51 +128,10 @@ void DMA_ADC_NVIC_Config(u8 cmd)
     DMA_ClearITPendingBit(DMA_IT_TC); //清除更新中断请求位
     if(cmd == ENABLE) {
         DMA_ITConfig(DMA1_Channel1,DMA_IT_TC,ENABLE); //传输完成中断
-        //DMA_ITConfig(DMA1_Channel4,DMA_IT_HT,ENABLE);  //半发送中断
-        //DMA_ITConfig(DMA1_Channel4,DMA_IT_TE,ENABLE);  //发送错误中断
     } else {
         DMA_ITConfig(DMA1_Channel1,DMA_IT_TC,DISABLE); //传输完成中断
-        //DMA_ITConfig(DMA1_Channel4,DMA_IT_HT,ENABLE);  //半发送中断
-        //DMA_ITConfig(DMA1_Channel4,DMA_IT_TE,ENABLE);  //发送错误中断
     }
 }
 
 ///////////////////////////////////////以下删除废弃代码
-//u8 SPI1_DMA_Config(void)
-//u8 SPI2_DMA_Config(void)
-//u8 SPI3_DMA_Config(void)
-////启动DMA传输 启用中断
-//u8 SPI1_DMA_TX(u8 *buffer,u16 len)
-//u8 SPI1_DMA_RX(u8 *buffer,u16 len)
-//u8 SPI2_DMA_TX(u8 *buffer,u16 len)
-//u8 SPI2_DMA_RX(u8 *buffer,u16 len)
-
-////初始化DMA中断 cmd 1 使能
-//void SPI1_DMA_NVIC_Config(u8 cmd)
-////初始化DMA中断 cmd 1 使能
-//void SPI2_DMA_NVIC_Config(u8 cmd)
-////初始化DMA中断 cmd 1 使能
-//void SPI3_DMA_NVIC_Config(u8 cmd)
-
-//ADC1
-//void DMA1_Channel1_IRQHandler()  
-////SPI1_RX/U3_TX
-//void DMA1_Channel2_IRQHandler()  
-////SPI1_TX/U3_RX
-//void DMA1_Channel3_IRQHandler()  
-//SPI2_RX/U1_TX
-//void DMA1_Channel4_IRQHandler() 
-//void DMA1_Channel5_IRQHandler() 
-//void DMA1_Channel6_IRQHandler() 
-//U2_TX
-//void DMA1_Channel7_IRQHandler() 
-//SPI3_RX
-//void DMA2_Channel1_IRQHandler() 
-////SPI3_TX
-//void DMA2_Channel2_IRQHandler() 
-//U4_RX
-//void DMA2_Channel3_IRQHandler() 
-//cannle4 
-//cannle5 U4_TX
-//void DMA2_Channel4_5_IRQHandler() 
 

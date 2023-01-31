@@ -30,7 +30,8 @@ void USART2_REC_EVENT(void);
 u8 NImingV7_Sendbuf_Init(void);
 //////////////////////////////////////////////////////////////////////
 
-//main
+// 心音采集主程序
+// 2023.1.30
 int main(void)
 {	
     g_WorkState = SEND_BULE;
@@ -44,7 +45,7 @@ int main(void)
     HCO5_GPIO_Init();
     uart1_init(460800);//串口初始化
     Main_printf("开机\r\n");
-    Main_printf("STM32F103C8 V5.1.2 单通道心音采集  配套硬件 V2.1.5 2022-07-26\r\n");	
+    Main_printf("STM32F103C8T6单通道心音采集   V0.1 2023-1-30\r\n");	
 
     LED1 = LED_ON;	
     LED2 = LED_ON;
@@ -83,7 +84,7 @@ int main(void)
 // 蓝牙发送串口数据
 void Send_BlueTooth(void)
 {
-    u16 i,j,z,res;
+    u16 i,j,res;
     u8 addcheck=0;
     u8 sumcheck=0;	
 	
