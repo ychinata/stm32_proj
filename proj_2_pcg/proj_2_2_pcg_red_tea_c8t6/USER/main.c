@@ -43,7 +43,7 @@ int main(void)
     LED_IO_Init();		
     KEY_IO_Init();
     HCO5_GPIO_Init();
-    UART1_Init(460800);//串口初始化
+    UART1_Init(38400);//串口初始化,原版460800
     OLED_Init();
     // debug
 	OLED_ShowString(1, 1, "PCG Demo:");	// 在1行1列显示
@@ -126,7 +126,7 @@ void Send_BlueTooth(void)
     
     Main_printf("开启蓝牙串口及DMA中断\r\n");
     HC05_ON;//开蓝牙		
-    HC05_uart_init(460800);//串口初始化 HC05串口
+    HC05_uart_init(38400);//串口初始化 HC05串口,原版460800
     // UART-DMA配置
     DMA_UART_Config(DMA1_Channel7, (u32)&USART2->DR, (u32)g_UART_Info->sendbuf);
     DMA_UART2_TX_NVIC_Config(ENABLE);	//开启串口 DMA中断
@@ -217,7 +217,7 @@ void Send_BlueTooth(void)
                 DMA_Enable(DMA1_Channel7, UART_SEND_LENGTH);	//发送数据
             } else if (g_UART_Info->UART_Queue->Queue_Full_flag == 1) {
                 g_UART_Info->UART_Queue->Queue_Full_flag = 0;
-                Main_printf("f ");
+                Main_printf("串口数据发送:\r\n");
             }
         } else if (QUEUE_SearchData(g_UART_Info->UART_Queue)) {	//若队列有数据
         	// 一帧20次采样的数据,填充发送缓冲区
@@ -246,7 +246,8 @@ void Send_BlueTooth(void)
             }
             g_UART_Info->Queue_pop_flag = 1;
             //取数据，队头自增，存数据，队尾自增
-            g_UART_Info->UART_Queue->front = (g_UART_Info->UART_Queue->front+1) % g_UART_Info->UART_Queue->capacity;                       
+            g_UART_Info->UART_Queue->front = (g_UART_Info->UART_Queue->front+1) % g_UART_Info->UART_Queue->capacity;
+            Main_printf("串口数据一帧充填buf完毕:\r\n");
         }
     }	
     //debug
