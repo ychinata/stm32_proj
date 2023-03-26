@@ -5,20 +5,19 @@
 #include "FFT.H"
 
 #define FFT_Size 256			/*输入序列的大小，在本程序中仅限2的次幂*/
-float FFT_Input[FFT_Size];	/*输入序列*/
+float FFT_Input[FFT_Size];	    /*输入序列*/
 float FFT_Output[FFT_Size/2];	/*输出序列*/
 
-typedef struct	/*复数结构体*/
-{
+/*复数结构体*/
+typedef struct	{
 	float Real;
 	float Imag;
-}Complex;
+} Complex;
 
 Complex x[FFT_Size];
 Complex W[FFT_Size];
 int size_x=FFT_Size;
 float PI=3.1415926535;
-
 
 void change(void);	/*变址*/
 void add(Complex ,Complex ,Complex *);	/*复数加法*/

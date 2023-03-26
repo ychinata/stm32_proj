@@ -22,18 +22,17 @@ void Key_Init(void)
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 
+// 获取键值
 uint8_t Key_GetKeyNum(void)
 {
 	uint8_t KeyNum=0;
-	if(Key1_Read()==0)
-	{
-		Delay_ms(20);
-		while(Key1_Read()==0);
-		Delay_ms(20);
-		KeyNum=1;
+	if (Key1_Read()==0) {       // 检测到按下
+		Delay_ms(20);           // 延时
+		while(Key1_Read()==0);  // 确实按下了
+		Delay_ms(20);           // 再延时
+		KeyNum=1;               // 赋值
 	}
-	if(Key2_Read()==0)
-	{
+	if (Key2_Read()==0) {
 		Delay_ms(20);
 		while(Key2_Read()==0);
 		Delay_ms(20);
@@ -47,18 +46,15 @@ void Key_Loop(void)
 {
 	uint8_t KeyNum=0;
 	KeyNum = Key_GetKeyNum();
-	if (KeyNum == 1)
-	{
-		if(Spectrum_flag==0) 
+	if (KeyNum == 1) {
+		if (Spectrum_flag==0) {
             Spectrum_flag=1;
-		else
-		{
+		} else {
 			Spectrum_flag=0;
 			Display_Text(); //显示欢迎界面
 		}
 	}	
-	if (KeyNum == 2)
-	{
+	if (KeyNum == 2){
 		Spectrum_Type++;
 		Spectrum_Type%=3;
 	}	

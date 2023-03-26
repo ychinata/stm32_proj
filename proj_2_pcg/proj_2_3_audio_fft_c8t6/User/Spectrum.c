@@ -13,7 +13,11 @@
 #define M	128
 #define N	64
 // 可调整参数
-#define SPECTRUM_LEVEL_DIV 8   //可以控制柱状幅度,初始值为64.MAX9814为512,LM393为16
+//可以控制柱状幅度,原始值为64
+//MAX9814为512,max4466更差. LM393为16
+#define SPECTRUM_LEVEL_DIV 512   
+// MAX9814为512是因为底噪太大?
+
 #define ADC_VALUE_DC_OFFSET 1550      //ADC采样值的直流偏移?初始值为2048. 1550对应1.25V(3.3V)
 
 enum SpectrumType {

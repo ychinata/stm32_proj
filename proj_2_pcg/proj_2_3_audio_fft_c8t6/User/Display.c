@@ -38,19 +38,15 @@ void Display_IRQHandler(void)
 	uint8_t i,j,k,data,byte_data;
 	TIM2_NUM++;
 
-	if(Spectrum_flag)
-	{
-		if(TIM2_NUM%1600==0) //OLED刷新太快的话会有卡顿
-		{
-			for(i=0;i<8;i++)
-			{
+	if (Spectrum_flag) {
+        //OLED刷新太快的话会有卡顿
+		if(TIM2_NUM%1600==0) {
+			for (i=0;i<8;i++) {
 				OLED_SetPointer(0,i);
-				for(j=0;j<128;j++)
-				{
+				for (j=0;j<128;j++) {
 					data = 1;
 					byte_data = 0;
-					for(k=0;k<8;k++)
-					{
+					for (k=0;k<8;k++) {
 						if(Display_Buffer[j][(7-i)*8+(7-k)]) byte_data |= data;
 						data = data << 1;
 					}
@@ -58,9 +54,7 @@ void Display_IRQHandler(void)
 				}
 			}
 		}
-	}
-	else
-	{
+	} else {
 		
 	}
 }
@@ -95,8 +89,7 @@ void Display_Text(void)
 void Display_SetLevel(uint8_t X,uint8_t Level,uint8_t Color)
 {
 	uint8_t i;
-	for(i=0;i<=Level;i++)
-	{
+	for(i=0;i<=Level;i++) {
 		Display_Buffer[X][i]=Color;
 	}
 }
@@ -105,8 +98,7 @@ void Display_SetLevel(uint8_t X,uint8_t Level,uint8_t Color)
 void Display_SetLevel2(uint8_t X,uint8_t Level,uint8_t Color)
 {
 	uint8_t i;
-	for(i=0;i<=Level;i++)
-	{
+	for(i=0;i<=Level;i++) {
 		Display_Buffer[X][N/2+i/2]=Color;
 		Display_Buffer[X][N/2-i/2]=Color;
 	}
@@ -116,10 +108,8 @@ void Display_SetLevel2(uint8_t X,uint8_t Level,uint8_t Color)
 void Display_ClearBuf(void)
 {
 	uint8_t i,j;
-	for(i=0;i<M;i++)
-	{
-		for(j=0;j<N;j++)
-		{
+	for(i=0;i<M;i++) {
+		for(j=0;j<N;j++) {
 			Display_Buffer[i][j]=0;
 		}
 	}
