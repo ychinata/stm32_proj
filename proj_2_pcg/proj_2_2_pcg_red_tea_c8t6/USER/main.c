@@ -40,7 +40,7 @@ int main(void)
     delay_init();	
     delay_ms(100);
     mem_init(SRAMIN);	//内存管理	
-    LED_IO_Init();		
+    //LED_IO_Init();		
     KEY_IO_Init();
     HCO5_GPIO_Init();
     UART1_Init(38400);//串口初始化,原版460800
@@ -126,7 +126,7 @@ void Send_BlueTooth(void)
     
     Main_printf("开启蓝牙串口及DMA中断\r\n");
     HC05_ON;//开蓝牙		
-    HC05_uart_init(38400);//串口初始化 HC05串口,原版460800
+    HC05_uart_init(460800);//串口初始化 HC05串口,原版460800
     // UART-DMA配置
     DMA_UART_Config(DMA1_Channel7, (u32)&USART2->DR, (u32)g_UART_Info->sendbuf);
     DMA_UART2_TX_NVIC_Config(ENABLE);	//开启串口 DMA中断

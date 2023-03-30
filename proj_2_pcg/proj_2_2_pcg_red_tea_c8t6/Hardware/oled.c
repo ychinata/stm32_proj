@@ -2,9 +2,14 @@
 #include "oled.h"
 #include "oled_font.h"
 
+#define OLED_4PIN_SCL GPIO_Pin_6
+#define OLED_4PIN_SDA GPIO_Pin_7
+//#define OLED_4PIN_SCL GPIO_Pin_8	// 江科大推荐,此时Pin_6/7要接VCC/GND
+//#define OLED_4PIN_SDA GPIO_Pin_9	// 江科大推荐,此时Pin_6/7要接VCC/GND
+
 /*引脚配置*/
-#define OLED_W_SCL(x)		GPIO_WriteBit(GPIOB, GPIO_Pin_8, (BitAction)(x))
-#define OLED_W_SDA(x)		GPIO_WriteBit(GPIOB, GPIO_Pin_9, (BitAction)(x))
+#define OLED_W_SCL(x)		GPIO_WriteBit(GPIOB, OLED_4PIN_SCL, (BitAction)(x))
+#define OLED_W_SDA(x)		GPIO_WriteBit(GPIOB, OLED_4PIN_SDA, (BitAction)(x))
 
 /*引脚初始化*/
 void OLED_I2C_Init(void)
@@ -14,9 +19,9 @@ void OLED_I2C_Init(void)
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);	
  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+	GPIO_InitStructure.GPIO_Pin = OLED_4PIN_SCL;
  	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+	GPIO_InitStructure.GPIO_Pin = OLED_4PIN_SDA;
  	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	
 	OLED_W_SCL(1);
