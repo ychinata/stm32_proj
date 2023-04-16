@@ -5,8 +5,8 @@
 #include "OLED.h"
 #include "OLEDFont.h"
 
-#define OLED_PIN_SCL GPIO_Pin_8 //同时要将PA6/PA7接VCC/GND
-#define OLED_PIN_SDA GPIO_Pin_9 //同时要将PA6/PA7接VCC/GND
+#define OLED_PIN_SCL GPIO_Pin_6 //同时要将PA6/PA7接VCC/GND
+#define OLED_PIN_SDA GPIO_Pin_7 //同时要将PA6/PA7接VCC/GND
 
 /*引脚配置*/
 #define OLED_W_SCL(x)		GPIO_WriteBit(GPIOB, OLED_PIN_SCL, (BitAction)(x))
