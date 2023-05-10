@@ -40,7 +40,7 @@ int main(void)
     delay_init();	
     delay_ms(100);
     mem_init(SRAMIN);	//内存管理	
-    LED_IO_Init();		
+    //LED_IO_Init();		
     KEY_IO_Init();
     HCO5_GPIO_Init();
     UART1_Init(38400);//串口初始化,原版460800
