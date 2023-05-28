@@ -29,7 +29,7 @@ All rights reserved
 #define Reduction_Ratio  30.0			//减速比30
 #define Perimeter  210.4867 			//周长，单位mm
 
-#define Middle_angle 0
+#define Middle_angle 3
 #define DIFFERENCE 100
 int EXTI15_10_IRQHandler(void);
 int Balance(float angle,float gyro);
