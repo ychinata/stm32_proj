@@ -24,7 +24,7 @@ All rights reserved
 Function: Initialize TIM2 to encoder interface mode
 Input   : none
 Output  : none
-函数功能：把TIM2初始化为编码器接口模式
+函数功能：把TIM2初始化为编码器接口模式(左轮编码器)
 入口参数：无
 返回  值：无
 **************************************************************************/
@@ -34,11 +34,11 @@ void Encoder_Init_TIM2(void)
   TIM_ICInitTypeDef TIM_ICInitStructure;  
   GPIO_InitTypeDef GPIO_InitStructure;
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);//使能定时器4的时钟
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);//使能PB端口时钟
+  RCC_APB2PeriphClockCmd(ENCODER_LEFT_IN_RCC, ENABLE);//使能PB端口时钟
 	
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1;	//端口配置
+  GPIO_InitStructure.GPIO_Pin = ENCODER_LEFT_PIN_A | ENCODER_LEFT_PIN_B;	//端口配置
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; //浮空输入
-  GPIO_Init(GPIOA, &GPIO_InitStructure);					      //根据设定参数初始化GPIOB
+  GPIO_Init(ENCODER_LEFT_IN_GPIO, &GPIO_InitStructure);					      //根据设定参数初始化GPIOB
   
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
   TIM_TimeBaseStructure.TIM_Prescaler = 0x0; // 预分频器 
@@ -60,7 +60,7 @@ void Encoder_Init_TIM2(void)
 Function: Initialize TIM4 to encoder interface mode
 Input   : none
 Output  : none
-函数功能：把TIM4初始化为编码器接口模式
+函数功能：把TIM4初始化为编码器接口模式(右轮编码器)
 入口参数：无
 返回  值：无
 **************************************************************************/
@@ -70,11 +70,11 @@ void Encoder_Init_TIM4(void)
   TIM_ICInitTypeDef TIM_ICInitStructure;  
   GPIO_InitTypeDef GPIO_InitStructure;
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);//使能定时器4的时钟
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);//使能PB端口时钟
+  RCC_APB2PeriphClockCmd(ENCODER_RIGHT_IN_RCC, ENABLE);//使能PB端口时钟
 	
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7;	//端口配置
+  GPIO_InitStructure.GPIO_Pin = ENCODER_RIGHT_PIN_A | ENCODER_RIGHT_PIN_B;	//端口配置
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; //浮空输入
-  GPIO_Init(GPIOB, &GPIO_InitStructure);					      //根据设定参数初始化GPIOB
+  GPIO_Init(ENCODER_RIGHT_IN_GPIO, &GPIO_InitStructure);					      //根据设定参数初始化GPIOB
   
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
   TIM_TimeBaseStructure.TIM_Prescaler = 0x0; // 预分频器 
