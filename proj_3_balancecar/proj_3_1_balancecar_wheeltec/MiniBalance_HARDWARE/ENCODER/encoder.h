@@ -21,6 +21,19 @@ All rights reserved
 #define __ENCODER_H
 #include <sys.h>	 
 #define ENCODER_TIM_PERIOD (u16)(65535)   //不可大于65535 因为F103的定时器是16位的。
+
+//定义电机编码器驱动管脚
+#define ENCODER_LEFT_IN_RCC    RCC_APB2Periph_GPIOA
+#define ENCODER_LEFT_IN_GPIO      GPIOA    //假设四个IN为同一GPIO组
+#define ENCODER_LEFT_PIN_A  GPIO_Pin_0      // 待确认哪个是A相哪个是B相
+#define ENCODER_LEFT_PIN_B  GPIO_Pin_1
+
+#define ENCODER_RIGHT_IN_RCC    RCC_APB2Periph_GPIOB
+#define ENCODER_RIGHT_IN_GPIO      GPIOB    //假设四个IN为同一GPIO组
+#define ENCODER_RIGHT_PIN_A  GPIO_Pin_6      // 待确认哪个是A相哪个是B相
+#define ENCODER_RIGHT_PIN_B  GPIO_Pin_7
+//定义电机编码器驱动管脚
+
 void Encoder_Init_TIM2(void);
 void Encoder_Init_TIM4(void);
 int Read_Encoder(u8 TIMX);

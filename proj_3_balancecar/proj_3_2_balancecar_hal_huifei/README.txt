@@ -46,6 +46,7 @@ Car_Task_5HZ
 Car_Task_Interaction
 
 /**************** 硬件连接 ********************/
+1.OLED 2.超声波 3.寻迹 4.蓝牙 5.陀螺仪 6.电机 7.电机编码器
 // OLED
 SCL <-> PB8
 SDA <-> PB9
@@ -98,7 +99,7 @@ TX <-> PB11
 RX <-> PB10
 
 
-//DRV8833 //ABIN2-MX_GPIO_Init //ABIN1-
+//DRV8833 //ABIN2-MX_GPIO_Init(PA3/4) //ABIN1-HAL_TIM_PWM_Init(PA6/7)
 AIN1 <-> PA7
 BIN1 <-> PA6
 AIN2 <-> PA3
@@ -118,7 +119,16 @@ TIM4: 编码器BC1/2:MX_TIM4_Init-HAL_TIM_Encoder_Init-HAL_TIM_Encoder_MspInit
     PA7     ------> TIM3_CH2 
 	//CH3/4?
 // 这四个通道是怎么映射的？
+// 四路PWM的实现：见HAL_TIM_PWM_PulseFinishedCallback。太复杂了。不如直接用PB0/PB1/PA6/PA7
 #define PWMA1   TIM3->CCR2
 #define PWMA2   TIM3->CCR3
 #define PWMB1   TIM3->CCR1
 #define PWMB2   TIM3->CCR4	
+
+群友@Gorlemon (2323827421)：
+main函数下面的HAL_TIM_PWM_PulseFinishedCallback/HAL_TIM_PeriodElapsedCallback，
+都是用于替换HAL中的同名函数。都在HAL_TIM_UnRegisterCallback有注销？
+类似于软件中断实现pwm，原本TIM3的CH3/CH4输出PWM到PB0/1管脚，改成输出到PA3/4管脚。
+b0/1没有输出，只是起到pwm中断的作用。可能作者设计原理图的时候搞错了吧，没直接使用b0/b1口。
+
+
