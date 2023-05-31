@@ -65,22 +65,23 @@ Output  : none
 函数功能：初始化电机接口
 入口参数：无
 返回  值：无
+修改历史：使用宏 2023.5.31 xxy
 **************************************************************************/
 void MiniBalance_Motor_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE); //使能PB端口时钟
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15;	//端口配置
+    RCC_APB2PeriphClockCmd(MOTOR_IN_RCC, ENABLE); //使能PB端口时钟
+    GPIO_InitStructure.GPIO_Pin = MOTOR_PIN_AIN1|MOTOR_PIN_AIN2|MOTOR_PIN_BIN1|MOTOR_PIN_BIN2;	//端口配置
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;      //推挽输出
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;     //50M
-    GPIO_Init(GPIOB, &GPIO_InitStructure);					      //根据设定参数初始化GPIOB 
+    GPIO_Init(MOTOR_IN_GPIO, &GPIO_InitStructure);					      //根据设定参数初始化GPIOB 
 }
 
 /**************************************************************************
 Function: Initialize PWM to drive motor
 Input   : arr：Auto reload value；psc：Prescaler coefficient
 Output  : none
-函数功能：初始化PWM，用于驱动电机 
+函数功能：初始化TIM1 PWM，用于驱动电机 
 入口参数：arr：自动重装值；psc：预分频系数
 返回  值：无
 **************************************************************************/
@@ -91,9 +92,9 @@ void MiniBalance_PWM_Init(u16 arr,u16 psc)
     TIM_OCInitTypeDef  TIM_OCInitStructure;
     MiniBalance_Motor_Init();	
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);// 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);  //使能GPIO外设时钟使能
+    RCC_APB2PeriphClockCmd(MOTOR_PWM_RCC , ENABLE);  //使能GPIO外设时钟使能
     //设置该引脚为复用输出功能,输出TIM1 CH1 CH4的PWM脉冲波形
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8|GPIO_Pin_11; //TIM_CH1 //TIM_CH4
+    GPIO_InitStructure.GPIO_Pin = MOTOR_PIN_PWMA|MOTOR_PIN_PWMB; //TIM_CH1 //TIM_CH4
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;  //复用推挽输出
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOA, &GPIO_InitStructure);

@@ -20,12 +20,32 @@ All rights reserved
 #ifndef __MOTOR_H
 #define __MOTOR_H
 #include <sys.h>	 
-#define PWMB   TIM1->CCR4  //PA11
-#define BIN2   PBout(12)
-#define BIN1   PBout(13)
-#define AIN2   PBout(15)
-#define AIN1   PBout(14)
+
+
+//定义电机驱动管脚：TB6612
+#define MOTOR_IN_RCC    RCC_APB2Periph_GPIOB
+#define MOTOR_IN_GPIO      GPIOB    //假设四个IN为同一GPIO组
+#define MOTOR_PIN_AIN1  GPIO_Pin_14
+#define MOTOR_PIN_AIN2  GPIO_Pin_15
+#define MOTOR_PIN_BIN1  GPIO_Pin_13
+#define MOTOR_PIN_BIN2  GPIO_Pin_12
+
+#define MOTOR_PWM_RCC       RCC_APB2Periph_GPIOA
+#define MOTOR_PWM_GPIO      GPIOA       ////假设2个PWM为同一GPIO组
+#define MOTOR_PIN_PWMA      GPIO_Pin_8
+#define MOTOR_PIN_PWMB      GPIO_Pin_11
+
+#define MOTOR_PX_OUT PBout
+//宏的名字建议加MOTOR_前缀
+#define AIN1   MOTOR_PX_OUT(MOTOR_PIN_AIN1)
+#define AIN2   MOTOR_PX_OUT(MOTOR_PIN_AIN2)
+#define BIN1   MOTOR_PX_OUT(MOTOR_PIN_BIN1)
+#define BIN2   MOTOR_PX_OUT(MOTOR_PIN_BIN2)
+
 #define PWMA   TIM1->CCR1  //PA8
+#define PWMB   TIM1->CCR4  //PA11
+
+//定义电机驱动管脚：TB6612
 
 void MiniBalance_PWM_Init(u16 arr,u16 psc);
 void MiniBalance_Motor_Init(void);
