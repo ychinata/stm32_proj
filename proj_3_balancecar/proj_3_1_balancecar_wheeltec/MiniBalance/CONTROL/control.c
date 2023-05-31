@@ -189,13 +189,18 @@ Output  : none
 **************************************************************************/
 void Set_Pwm(int motor_left,int motor_right)
 {
-  if(motor_left>0)	    BIN1=1,			BIN2=0; //前进 
-	else           			  BIN1=0,			BIN2=1; //后退
-	PWMB=myabs(motor_left);	
-  if(motor_right>0)			AIN2=1,			AIN1=0;	//前进
-	else 	        			  AIN2=0,			AIN1=1; //后退
-	PWMA=myabs(motor_right);
+    if(motor_left>0)	    
+        BIN1=1,			BIN2=0; //前进 
+    else           			  
+        BIN1=0,			BIN2=1; //后退
+    PWMB = myabs(motor_left);	
+    if(motor_right>0)			
+        AIN2=1,			AIN1=0;	//前进
+    else 	        			  
+        AIN2=0,			AIN1=1; //后退
+    PWMA = myabs(motor_right);
 }
+
 /**************************************************************************
 Function: PWM limiting range
 Input   : IN：Input  max：Maximum value  min：Minimum value
