@@ -34,18 +34,18 @@ void uart3_init(u32 bound)
 	USART_InitTypeDef USART_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 	 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);	//使能UGPIOB时钟
+	RCC_APB2PeriphClockCmd(BT_IN_RCC, ENABLE);	//使能UGPIOB时钟
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);	//使能USART3时钟
 	//USART3_TX  
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10; //PB.10
+  GPIO_InitStructure.GPIO_Pin = BT_PIN_TX;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;	//复用推挽输出
-  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_Init(BT_IN_GPIO, &GPIO_InitStructure);
    
   //USART3_RX	  
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;//PB11
+  GPIO_InitStructure.GPIO_Pin = BT_PIN_RX;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;//浮空输入
-  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_Init(BT_IN_GPIO, &GPIO_InitStructure);
 
   //Usart3 NVIC 配置
   NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
