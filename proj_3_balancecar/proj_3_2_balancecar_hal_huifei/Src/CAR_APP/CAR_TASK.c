@@ -8,9 +8,10 @@
 #include "delay.h"
 #include "my_usart.h"
 #include "oled.h"
+
 #define RXBUFFER_LEN 20
 
-
+//¶¨ÒåÈ«¾Ö±äÁ¿
 struct mpu6050_data outMpu;
 int Balance_PWm,Velocity_Pwm,Turn_Pwm=0;//Ö±Á¢»·¡¢ËÙ¶È»·¼ÆËãµÄpwm
 int Encoder_left,Encoder_right;//±àÂëÆ÷Öµ
@@ -22,6 +23,7 @@ int hf_Mode = 0;//Ð¡³µ¹¤×÷Ä£Ê½ 0 Ò£¿ØÄ£Ê½£»1 ±ÜÕÏÄ£Ê½£»2 ³¬Éù²¨¸úËæ 3Ñ²ÏßÄ£Ê½»¹Ã
 int srflow_dis = 250,dis_err = 0;//³¬Éù²¨¶¨¾à¸úËæ¾àÀë
 int rxloss_flag = 1,avoidance_flag = 0;
 int rx_cnt = 0;//Ê§¿Ø±ê¼Ç
+int g_BTMustFlag = 0;	// ±ØÐëÁ¬½ÓÀ¶ÑÀ±êÖ¾£º1±ØÐëÁ¬½Ó£¬0ÎÞÐèÁ¬½Ó
 
 
 //»·¾³Êý¾Ý²É¼¯ÈÎÎñ
@@ -42,42 +44,40 @@ void Car_Task_200HZ(void)
 **************************************************************************************************************/
 void Car_Task_100HZ(void)
 {
-		hf_Mode = BT_Data.mode;
-    switch(hf_Mode) {
-    case 0://Ò£¿ØÄ£Ê½
-        Movement = BT_Data.y*1.2;
-        break;
-    case 1://±ÜÕÏÄ£Ê½
-        if(dis<250 && BT_Data.y>0) {
-            Movement=0;
-            avoidance_flag = 1;
-        }
-        else if(dis<200)  {
-            Movement = -(200-dis)*0.25;
-            avoidance_flag = 1;
-        }
-        else {
-					avoidance_flag = 0;
-					Movement = BT_Data.y*0.5;
-				}
-        break;
-		case 2://³¬Éù²¨¸úËæ
-			dis_err = srflow_dis-dis;
-			if (dis>500||(dis_err<30&&dis_err>-30)){//Ì«Ô¶ÁË¾ÍËãÁË²»¸úÁË
-				Movement = 0;
-			}
-			else{
-			Movement = -dis_err*0.15;
-			}
-			break;
-
-    default:
-        break;
-
+    hf_Mode = BT_Data.mode;
+    switch (hf_Mode) {
+        case 0://Ò£¿ØÄ£Ê½
+            Movement = BT_Data.y*1.2;
+            break;
+        case 1://±ÜÕÏÄ£Ê½
+            if(dis<250 && BT_Data.y>0) {
+                Movement=0;
+                avoidance_flag = 1;
+            } else if(dis<200)  {
+                Movement = -(200-dis)*0.25;
+                avoidance_flag = 1;
+            } else {
+                avoidance_flag = 0;
+                Movement = BT_Data.y*0.5;
+            }
+            break;
+        case 2://³¬Éù²¨¸úËæ
+            dis_err = srflow_dis-dis;
+            if (dis>500||(dis_err<30&&dis_err>-30)){//Ì«Ô¶ÁË¾ÍËãÁË²»¸úÁË
+                Movement = 0;
+            } else{
+                Movement = -dis_err*0.15;
+            }
+            break;
+        default:
+            break;
     }
-		taget_yaw -= BT_Data.x*0.015;
-    if(taget_yaw >180) taget_yaw -= 360;
-    if(taget_yaw <-180) taget_yaw +=360;
+    
+    taget_yaw -= BT_Data.x*0.015;
+    if(taget_yaw >180) 
+        taget_yaw -= 360;
+    if(taget_yaw <-180) 
+        taget_yaw +=360;
     Encoder_left = Read_Encoder(1);
     Encoder_right = -Read_Encoder(2);//¶Á±àÂëÆ÷
     Balance_PWm =Vertical_Ring_PD(outMpu.pitch,outMpu.gyro_y);//Ö±Á¢»·
@@ -85,11 +85,10 @@ void Car_Task_100HZ(void)
     Turn_Pwm = -Vertical_turn_PD(taget_yaw,outMpu.yaw,outMpu.gyro_z);
     Motor1 = Balance_PWm+Velocity_Pwm+Turn_Pwm ;
     Motor2 = Balance_PWm+Velocity_Pwm-Turn_Pwm ;
-		Motor2*=1.08;
+    Motor2*=1.08;
     PWM_Limiting(&Motor1,&Motor2);//pwmÏÞ·ù
-		if(Turn_off(outMpu.pitch)!=1) Set_PWM(Motor1,Motor2);
-
-   
+    if(Turn_off(outMpu.pitch)!=1) 
+        Set_PWM(Motor1,Motor2);  
 }
 
 
@@ -106,74 +105,63 @@ void Car_Task_5HZ(void)
 	Getdistance();
 }
 
+/*********************************************
+ *Func£º½»»¥½çÃæÏÔÊ¾Ö÷Òª²ÎÊý
+ *********************************************/
 void Car_Task_Interaction(void)
 {
 	
-   if(BT_Data.rxflag == 0){
+	if (BT_Data.rxflag == 0) {
 		rx_cnt ++;
-	}
-	else{
+	} else {
 		rx_cnt =0;
 		BT_Data.rxflag =0;
 	}
 			
-		if (rx_cnt >5){
-			if(rxloss_flag ==0) {
-				OLED_CLS();
-				OLED_ShowStr(40,3,"rxloss",2);
-				rxloss_flag = 1;
-			}
-			OLED_ShowNum(40,5,rx_cnt,8,2);
-			
+	if (rx_cnt >5 && g_BTMustFlag){
+		if(rxloss_flag ==0) {
+			OLED_CLS();
+			OLED_ShowStr(40,3,"rxloss",2);
+			rxloss_flag = 1;
 		}
+		OLED_ShowNum(40,5,rx_cnt,8,2);
 		
-		else{
-			if(rxloss_flag ==1){
-				OLED_CLS();
-				OLED_ShowStr (1,1,"pitch:",1);
-				OLED_ShowStr (1,3,"roll:",1);
-				OLED_ShowStr (1,5,"yaw:",1);
+	} else {
+		// ½çÃæÉÏµÄ×Ö·ûÖ»Ë¢ÐÂÒ»´Î
+		if (rxloss_flag ==1) {
+			OLED_CLS();
+			OLED_ShowStr (1,1,"pitch:",1);
+			OLED_ShowStr (1,3,"roll:",1);
+			OLED_ShowStr (1,5,"yaw:",1);
+			if (hf_Mode == ENUM_CAR_TASK_REMOTE) {
+				OLED_ShowStr (1,7,"pwm:",1);
+			} else {
 				OLED_ShowStr (1,7,"dis:",1);
-				rxloss_flag = 0;
+			}
+			rxloss_flag = 0;
 		}
-			if(outMpu.pitch<0)
-    {
-        OLED_ShowChar(46,1,'-',2);
-        OLED_ShowFloat(50,1,-outMpu.pitch,3,2);
-    }
-    else
-    {
-        OLED_ShowChar(46,1,' ',2);
-        OLED_ShowFloat(50,1,outMpu.pitch,3,2);
-    }
 
-    if(outMpu.roll<0)
-    {
-        OLED_ShowChar(46,3,'-',2);
-        OLED_ShowFloat(50,3,-outMpu.roll,3,2);
-    }
-    else
-    {
-        OLED_ShowChar(46,3,' ',2);
-        OLED_ShowFloat(50,3,outMpu.roll,3,2);
-    }
-
-    if(outMpu.yaw<0)
-    {
-        OLED_ShowChar(46,5,'-',2);
-        OLED_ShowFloat(50,5,-outMpu.yaw,3,2);
-    }
-    else
-    {
-        OLED_ShowChar(46,5,' ',2);
-        OLED_ShowFloat(50,5,outMpu.yaw,3,2);
-    }
+		// ÏÔÊ¾pitch:¸©Ñö½Ç
+		OLED_ShowFloatWithSign(46, 1, outMpu.pitch, 3, ENUM_OLED_FONT_SIZE_2);		
+		//ÏÔÊ¾roll:ºá¹ö½Ç  
+		OLED_ShowFloatWithSign(46, 3, outMpu.roll, 3, ENUM_OLED_FONT_SIZE_2);		
+		// ÏÔÊ¾yaw:º½Ïò½Ç 	
+		OLED_ShowFloatWithSign(46, 5, outMpu.yaw, 3, ENUM_OLED_FONT_SIZE_2);		
 		
-        OLED_ShowChar(46,7,' ',2);
-       // OLED_ShowFloat(50,7,dis,4,2);
-			 OLED_ShowNum(56,7,dis,4,2);
+		if (hf_Mode == ENUM_CAR_TASK_REMOTE) {
+			OLED_ShowFloatWithSign(40, 7, (float)Motor1, 4, ENUM_OLED_FONT_SIZE_2);
+			OLED_ShowFloatWithSign(80, 7, (float)Motor2, 4, ENUM_OLED_FONT_SIZE_2);				
+		} else {
+			// ÏÔÊ¾³¬Éù²¨¾àÀë
+			OLED_ShowChar(46,7,' ',2);
+			OLED_ShowNum(56,7,dis,4,2);
 			OLED_ShowStr(80,7,"mm",1);
-		if (avoidance_flag == 1) OLED_ShowStr(95,7,"!!",1);
-		else OLED_ShowStr(95,7,"  ",1);
+			if (avoidance_flag == 1) 
+				OLED_ShowStr(95,7,"!!",1);
+			else 
+				OLED_ShowStr(95,7,"  ",1);
+		}
+
 	}
 }
+

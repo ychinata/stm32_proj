@@ -264,3 +264,24 @@ void OLED_ShowFloat(uint8_t x,uint8_t y,float num, uint8_t len, uint8_t size2)
 	OLED_ShowChar(x+(6*size2/2)*len,y,'.',2);
 	OLED_ShowNum(x+(6*size2/2)*(len+1),y,temp,2,size2);
 }
+
+/*
+ * Func: 显示带符号的Float值，若为负数显示'-'，若为正数显示'+'
+ * Para: x-横坐标，范围0-127
+ 		y-纵坐标，当charsize=2时，第1到4行分别为：1/3/5/7
+ * Return: 无
+ * Author：xxy
+ * Date：2023.8.21
+ */
+void OLED_ShowFloatWithSign(uint8_t x, uint8_t y, float num, uint8_t len, uint8_t charsize)
+{
+	if (num < 0) {
+		OLED_ShowChar(x, y,'-', charsize);
+		OLED_ShowFloat(x+4, y, -num, len, charsize);
+	} else {
+		OLED_ShowChar(x, y,'+', charsize);
+		OLED_ShowFloat(x+4, y, num, len, charsize);
+	}
+}
+
+

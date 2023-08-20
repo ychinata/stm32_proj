@@ -5,7 +5,9 @@ User_USART BT_Data;		//接收数据
 //初始化函数
 void User_USART_Init(User_USART *Data)
 {
-    for(uint8_t i=0; i < RXBUFFER_LEN; i++)	Data->RxBuffer[i] = 0;
+    for(uint8_t i=0; i < RXBUFFER_LEN; i++) {
+		Data->RxBuffer[i] = 0;
+	}
     Data->frame_head = 0xA5;
     Data->frame_tail = 0x5A;
     Data->Rx_flag = 0;

@@ -2956,7 +2956,7 @@ void mget_ms(unsigned long *time)
 uint8_t mpu_dmp_init(void)
 {
     uint8_t res=0;
-    MPU_IIC_Init(); 	//初始化IIC总线
+    IIC_GPIO_Init(); 	//初始化IIC总线
     if(mpu_init()==0)	//初始化MPU6050
     {
         res=mpu_set_sensors(INV_XYZ_GYRO|INV_XYZ_ACCEL);//设置所需要的传感器

@@ -153,33 +153,33 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_StartTask_200HZ */
 void StartTask_200HZ(void const * argument)
 {
-  /* USER CODE BEGIN StartTask_200HZ */
-    
-		vTaskSuspendAll() ;
-		
-		OLED_Init();
-	  OLED_CLS();
-		OLED_ShowStr (1,1,"mpu init--",2);
-    while(mpu_dmp_init()) {}
-		OLED_ShowStr (1,3,"mpu ok",2);
-		printf("200HZ start\n");	
-		delay_ms(50);	
-		OLED_ShowStr (1,3,"HF start",2);
-		delay_ms(200);	
-		OLED_CLS();
-		OLED_ShowStr (1,1,"powered by",2);	
-		OLED_ShowStr (35,3,"HF",2);
-		delay_ms(500);
-		task_flag = 1;
+	/* USER CODE BEGIN StartTask_200HZ */
+
+	vTaskSuspendAll() ;
+
+	OLED_Init();
+	OLED_CLS();
+	OLED_ShowStr (1,1,"mpu init--",2);
+	while(mpu_dmp_init()) {}
+	
+	OLED_ShowStr (1,3,"mpu ok",2);
+	printf("200HZ start\n");	
+	delay_ms(50);	
+	OLED_ShowStr (1,3,"HF start",2);
+	delay_ms(200);	
+	OLED_CLS();
+	OLED_ShowStr (1,1,"powered by",2);	
+	OLED_ShowStr (35,3,"HF",2);
+	delay_ms(500);
+	task_flag = 1;
 			
-		xTaskResumeAll() ;
+	xTaskResumeAll() ;
     
     /* Infinite loop */
-    for(;;)
-    {
-			//vTaskSuspendAll() ;//临界代码保护开始
-			Car_Task_200HZ();
-			//xTaskResumeAll() ; //临界代码保护结束
+    for(;;) {
+		//vTaskSuspendAll() ;//临界代码保护开始
+		Car_Task_200HZ();
+		//xTaskResumeAll() ; //临界代码保护结束
  
       osDelay(5);
     }
