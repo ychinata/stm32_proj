@@ -96,41 +96,41 @@ int fgetc(FILE *f)
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
+	/* USER CODE BEGIN 1 */
 
 
-  /* USER CODE END 1 */
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_TIM3_Init();
-  MX_TIM2_Init();
-  MX_USART3_UART_Init();
-  MX_TIM4_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_DMA_Init();
+	MX_TIM3_Init();
+	MX_TIM2_Init();
+	MX_USART3_UART_Init();
+	MX_TIM4_Init();
+  	/* USER CODE BEGIN 2 */
     //	HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_4);//³¬Éù²¨ÖÐ¶Ï
     printf("Hello,this is zbz's banlance car.\n");
-		User_USART_Init(&BT_Data);
+	User_USART_Init(&BT_Data);
 		// ¼ÓÈëDMA¿ÕÏÐÖÐ¶Ï
     HAL_UART_Receive_DMA(&huart3,BT_Data.RxBuffer,RXBUFFER_LEN);
-		__HAL_UART_ENABLE_IT(&huart3,UART_IT_IDLE);//¿ªÆô´®¿Ú¿ÕÏÐÖÐ¶Ï
+	__HAL_UART_ENABLE_IT(&huart3,UART_IT_IDLE);//¿ªÆô´®¿Ú¿ÕÏÐÖÐ¶Ï
 		
     __HAL_TIM_ENABLE_IT(&htim3, TIM_IT_UPDATE);
     HAL_TIM_PWM_Start (&htim3,TIM_CHANNEL_1);
@@ -140,12 +140,12 @@ int main(void)
     HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);//Æô¶¯×ó±àÂëÆ÷
     HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);//Æô¶¯ÓÒ±àÂëÆ÷
 
-  /* USER CODE END 2 */
+	/* USER CODE END 2 */
 
-  /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init(); 
-  /* Start scheduler */
-  osKernelStart();
+	/* Call init function for freertos objects (in freertos.c) */
+	MX_FREERTOS_Init(); 
+	/* Start scheduler */
+	osKernelStart();
  
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */

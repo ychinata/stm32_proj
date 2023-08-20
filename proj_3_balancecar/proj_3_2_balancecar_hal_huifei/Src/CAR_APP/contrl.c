@@ -50,14 +50,10 @@ int Read_Encoder(u8 TIMX)
 
 
 /**************************************************************************************************************
-*函数名:Vertical_Ring_PD()
-*功能:直立环PD控制
-*形参:(float Angle):x轴的角度/(float Gyro):x轴的角速度
-*返回值:经过PID转换之后的PWM值
-**************************************************************************************************************/
-//直立环的PD
-
-
+ *功能:直立环PD控制
+ *形参:(float Angle):x轴的角度/(float Gyro):x轴的角速度
+ *返回值:经过PID转换之后的PWM值
+ **************************************************************************************************************/
 int	Vertical_Ring_PD(float Angle,float Gyro)
 {
     float Bias;//目标偏差
@@ -72,12 +68,10 @@ int	Vertical_Ring_PD(float Angle,float Gyro)
 
 
 /**************************************************************************************************************
-*函数名:Vertical_speed_PI()
 *功能；速度环PI控制
 *形参:(int encoder_left):左轮编码器值/(int encoder_right):编码器右轮的值/(float Angle):x轴角度值
 *返回值:
 **************************************************************************************************************/
-
 int Vertical_speed_PI(int encoder_left,int encoder_right,float Angle,float Movement )
 {
     static float Velocity,Encoder_Least,Encoder;
@@ -94,13 +88,13 @@ int Vertical_speed_PI(int encoder_left,int encoder_right,float Angle,float Movem
     Velocity=Encoder*PID.Velocity_Kp+Encoder_Integral*PID.Velocity_Ki;      //速度控制
 
 
-    if(Turn_off(Angle)==1)   Encoder_Integral=0;            //电机关闭后清除积分
+    if(Turn_off(Angle)==1)   
+		Encoder_Integral=0;            //电机关闭后清除积分
     return Velocity;
 }
 
 
 /**************************************************************************************************************
-*函数名:Vertical_turn_PD()
 *功能:转向环PD
 *形参:taget_yaw 目标yaw， yaw 陀螺仪yaw ， gyro 陀螺仪yaw方向角速度
 *返回值:无
@@ -127,7 +121,7 @@ int Vertical_turn_PD(float taget_yaw,float yaw,float gyro)
 ***************************************************************************************************************/
 void PWM_Limiting(int *motor1,int *motor2)
 {
-    int Amplitude=7999;//3204
+    int Amplitude=7999;//3204	// MX_TIM3_Init的周期也是7999
     if(*motor1<-Amplitude) *motor1=-Amplitude;
     if(*motor1>Amplitude)  *motor1=Amplitude;
     if(*motor2<-Amplitude) *motor2=-Amplitude;
@@ -193,26 +187,20 @@ u8 Turn_off(const float Angle)
 
 void Set_PWM(int motor1,int motor2)
 {
-    if(motor1>0)
-    {
+    if(motor1>0) {
         PWMA2=Dead_Zone+(abs(motor1))*1.17;
         PWMA1=0;
-
-    }
-    else
-    {
+    } else {
         PWMA2 =0;
         PWMA1=Dead_Zone+(abs(motor1))*1.17;
     }
 
-
-    if(motor2>0)		{
-
+    if(motor2<0) {  // 提示：这里有坑，要把>改成<
         PWMB2 = Dead_Zone+(abs(motor2))*1.17;
         PWMB1 = 0;
-    }
-    else
-    {   PWMB2 = 0;
+    } else {   
+        PWMB2 = 0;
         PWMB1=Dead_Zone+(abs(motor2))*1.17;
     }
 }
+
