@@ -8,9 +8,10 @@
 #include "delay.h"
 #include "my_usart.h"
 #include "oled.h"
+
 #define RXBUFFER_LEN 20
 
-
+//定义全局变量
 struct mpu6050_data outMpu;
 int Balance_PWm,Velocity_Pwm,Turn_Pwm=0;//直立环、速度环计算的pwm
 int Encoder_left,Encoder_right;//编码器值
@@ -104,6 +105,9 @@ void Car_Task_5HZ(void)
 	Getdistance();
 }
 
+/*********************************************
+ *Func：交互界面显示主要参数
+ *********************************************/
 void Car_Task_Interaction(void)
 {
 	
