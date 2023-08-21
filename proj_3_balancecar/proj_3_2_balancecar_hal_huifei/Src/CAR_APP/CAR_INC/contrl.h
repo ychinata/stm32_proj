@@ -5,7 +5,7 @@
 
 
 //»úÐµ0µã
-#define Mechanical_balance -3.23//
+#define Mechanical_balance 1.5 //
 
 
 //#define AIN1(PinState)    HAL_GPIO_WritePin( GPIOB, GPIO_PIN_0, (GPIO_PinState)PinState)

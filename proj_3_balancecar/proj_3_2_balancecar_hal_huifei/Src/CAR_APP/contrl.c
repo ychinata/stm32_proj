@@ -13,21 +13,29 @@ int   control_turn=64;                             //转向控制
 
 //PID调节参数
 struct pid_arg PID = {
-    .Balance_Kp=160, //-261 183.7
-    .Balance_Kd=0.70,//-0.68 0.335
-    .Velocity_Kp=-0,//-98 44
-    .Velocity_Ki=-0,//-1.13 0.6
-    .Turn_Kp = 0,//置零 30 
-    .Turn_Kd = 0,//置零 0.1
+    .Balance_Kp=160, 	
+    .Balance_Kd=0.7,	
+    .Velocity_Kp=40,	
+    .Velocity_Ki=0.2,	
+    .Turn_Kp = 0,	
+    .Turn_Kd = 0.5,	
 };
+
+// 2023.8.21调试结果
+//.Balance_Kp=160,
+//.Balance_Kd=0.7,
+//.Velocity_Kp=40,	
+//.Velocity_Ki=0.2,	
+//.Turn_Kp = 0,	
+//.Turn_Kd = 0.5,	
 
 //struct pid_arg PID = {
 //	.Balance_Kp=-280 ,//-230 245
 //	.Balance_Kd=-0.7,//-0.16 0.50
 //	.Velocity_Kp=-120,//-48 70 100
 //	.Velocity_Ki=-2.9,//-0.24 0.21 0.325
-//	.Turn_Kp = 70,//置零
-//	.Turn_Kd = 0.5,//置零
+//	.Turn_Kp = 70,
+//	.Turn_Kd = 0.5,
 //};
 
 
