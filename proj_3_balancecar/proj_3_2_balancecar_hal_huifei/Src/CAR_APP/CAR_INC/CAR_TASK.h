@@ -17,6 +17,15 @@ struct mpu6050_data{
 	float yaw;
 };
 
+enum EnumCarTaskType {
+	//小车工作模式：0 遥控模式；1 避障模式；2 超声波跟随；3巡线模式还没写
+	ENUM_CAR_TASK_REMOTE = 0,
+	ENUM_CAR_TASK_AVOID,
+	ENUM_CAR_TASK_FOLLOW,
+	ENUM_CAR_TASK_TRACK,
+	ENUM_CAR_TASK_END
+};
+
 extern struct mpu6050_data outMpu;
 extern float Movement;
 extern int Contrl_Turn;

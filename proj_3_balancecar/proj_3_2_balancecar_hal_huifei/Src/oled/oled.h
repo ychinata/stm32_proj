@@ -11,6 +11,14 @@
 #define COM				0x00  // OLED ??(????)
 #define DAT 			0x40  // OLED ??(????)
 
+
+enum EnumOledFontSize {
+	ENUM_OLED_FONT_SIZE_2 = 2,
+	ENUM_OLED_FONT_SIZE_16 = 16,
+	ENUM_OLED_FONT_SIZE_END
+};
+
+
 void WriteCmd(unsigned char I2C_Command);//???
 void WriteDat(unsigned char I2C_Data);//???
 void OLED_Init(void);//???
@@ -27,7 +35,8 @@ void OLED_ShowFloat(uint8_t x,uint8_t y,float num, uint8_t len, uint8_t size2);
 void OLED_ShowChar(u8 x,u8 y,u8 chr,u8 Char_Size);
 u32 oled_pow(u8 m,u8 n);
 void OLED_ShowNum(u8 x,u8 y,u32 num,u8 len,u8 size2);//size2(16|12)
-
+//
+void OLED_ShowFloatWithSign(uint8_t x, uint8_t y, float num, uint8_t len, uint8_t charsize);
 
 
 

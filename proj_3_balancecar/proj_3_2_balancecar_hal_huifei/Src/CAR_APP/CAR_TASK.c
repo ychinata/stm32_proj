@@ -22,6 +22,7 @@ int hf_Mode = 0;//Ð¡³µ¹¤×÷Ä£Ê½ 0 Ò£¿ØÄ£Ê½£»1 ±ÜÕÏÄ£Ê½£»2 ³¬Éù²¨¸úËæ 3Ñ²ÏßÄ£Ê½»¹Ã
 int srflow_dis = 250,dis_err = 0;//³¬Éù²¨¶¨¾à¸úËæ¾àÀë
 int rxloss_flag = 1,avoidance_flag = 0;
 int rx_cnt = 0;//Ê§¿Ø±ê¼Ç
+int g_BTMustFlag = 0;	// ±ØÐëÁ¬½ÓÀ¶ÑÀ±êÖ¾£º1±ØÐëÁ¬½Ó£¬0ÎÞÐèÁ¬½Ó
 
 
 //»·¾³Êý¾Ý²É¼¯ÈÎÎñ
@@ -113,7 +114,7 @@ void Car_Task_Interaction(void)
 		BT_Data.rxflag =0;
 	}
 			
-	if (rx_cnt >5){
+	if (rx_cnt >5 && g_BTMustFlag){
 		if(rxloss_flag ==0) {
 			OLED_CLS();
 			OLED_ShowStr(40,3,"rxloss",2);
@@ -122,46 +123,41 @@ void Car_Task_Interaction(void)
 		OLED_ShowNum(40,5,rx_cnt,8,2);
 		
 	} else {
+		// ½çÃæÉÏµÄ×Ö·ûÖ»Ë¢ÐÂÒ»´Î
 		if (rxloss_flag ==1) {
 			OLED_CLS();
 			OLED_ShowStr (1,1,"pitch:",1);
 			OLED_ShowStr (1,3,"roll:",1);
 			OLED_ShowStr (1,5,"yaw:",1);
-			OLED_ShowStr (1,7,"dis:",1);
+			if (hf_Mode == ENUM_CAR_TASK_REMOTE) {
+				OLED_ShowStr (1,7,"pwm:",1);
+			} else {
+				OLED_ShowStr (1,7,"dis:",1);
+			}
 			rxloss_flag = 0;
 		}
-		if(outMpu.pitch<0) {
-	        OLED_ShowChar(46,1,'-',2);
-	        OLED_ShowFloat(50,1,-outMpu.pitch,3,2);
-    	} else {
-	        OLED_ShowChar(46,1,' ',2);
-	        OLED_ShowFloat(50,1,outMpu.pitch,3,2);
-    	}
 
-	    if (outMpu.roll<0) {
-	        OLED_ShowChar(46,3,'-',2);
-	        OLED_ShowFloat(50,3,-outMpu.roll,3,2);
-	    } else {
-	        OLED_ShowChar(46,3,' ',2);
-	        OLED_ShowFloat(50,3,outMpu.roll,3,2);
-	    }
-
-	    if (outMpu.yaw<0) {
-	        OLED_ShowChar(46,5,'-',2);
-	        OLED_ShowFloat(50,5,-outMpu.yaw,3,2);
-	    } else {
-	        OLED_ShowChar(46,5,' ',2);
-	        OLED_ShowFloat(50,5,outMpu.yaw,3,2);
-	    }
+		// ÏÔÊ¾pitch:¸©Ñö½Ç
+		OLED_ShowFloatWithSign(46, 1, outMpu.pitch, 3, ENUM_OLED_FONT_SIZE_2);		
+		//ÏÔÊ¾roll:ºá¹ö½Ç  
+		OLED_ShowFloatWithSign(46, 3, outMpu.roll, 3, ENUM_OLED_FONT_SIZE_2);		
+		// ÏÔÊ¾yaw:º½Ïò½Ç 	
+		OLED_ShowFloatWithSign(46, 5, outMpu.yaw, 3, ENUM_OLED_FONT_SIZE_2);		
 		
-        OLED_ShowChar(46,7,' ',2);
-       // OLED_ShowFloat(50,7,dis,4,2);
-		OLED_ShowNum(56,7,dis,4,2);
-		OLED_ShowStr(80,7,"mm",1);
-		if (avoidance_flag == 1) 
-			OLED_ShowStr(95,7,"!!",1);
-		else 
-			OLED_ShowStr(95,7,"  ",1);
+		if (hf_Mode == ENUM_CAR_TASK_REMOTE) {
+			OLED_ShowFloatWithSign(40, 7, (float)Motor1, 4, ENUM_OLED_FONT_SIZE_2);
+			OLED_ShowFloatWithSign(80, 7, (float)Motor2, 4, ENUM_OLED_FONT_SIZE_2);				
+		} else {
+			// ÏÔÊ¾³¬Éù²¨¾àÀë
+			OLED_ShowChar(46,7,' ',2);
+			OLED_ShowNum(56,7,dis,4,2);
+			OLED_ShowStr(80,7,"mm",1);
+			if (avoidance_flag == 1) 
+				OLED_ShowStr(95,7,"!!",1);
+			else 
+				OLED_ShowStr(95,7,"  ",1);
+		}
+
 	}
 }
 
