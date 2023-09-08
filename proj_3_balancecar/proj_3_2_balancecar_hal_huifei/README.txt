@@ -98,7 +98,7 @@ TX <-> PB11
 RX <-> PB10
 
 
-//DRV8833 //ABIN2-MX_GPIO_Init //ABIN1-
+//DRV8833 //ABIN2-MX_GPIO_Init(PA3/4) //ABIN1-HAL_TIM_PWM_Init(PA6/7)
 AIN1 <-> PA7
 BIN1 <-> PA6
 AIN2 <-> PA3
@@ -118,6 +118,7 @@ TIM4: 编码器BC1/2:MX_TIM4_Init-HAL_TIM_Encoder_Init-HAL_TIM_Encoder_MspInit
     PA7     ------> TIM3_CH2 
 	//CH3/4?
 // 这四个通道是怎么映射的？
+// 四路PWM的实现：见HAL_TIM_PWM_PulseFinishedCallback。太复杂了。不如直接用PB0/PB1/PA6/PA7
 #define PWMA1   TIM3->CCR2
 #define PWMA2   TIM3->CCR3
 #define PWMB1   TIM3->CCR1

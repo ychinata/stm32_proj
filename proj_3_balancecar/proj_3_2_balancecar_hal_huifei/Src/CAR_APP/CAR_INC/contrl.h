@@ -16,11 +16,12 @@
 
 //#define PWMA   TIM3->CCR1 
 //#define PWMB   TIM3->CCR2
-#define PWMA1   TIM3->CCR2
-#define PWMA2   TIM3->CCR3
 
-#define PWMB1   TIM3->CCR1
-#define PWMB2   TIM3->CCR4
+// 四路PWM的实现：见HAL_TIM_PWM_PulseFinishedCallback
+#define PWMA1   TIM3->CCR2	//PA7-AIN1
+#define PWMA2   TIM3->CCR3	//PA3-AIN2
+#define PWMB1   TIM3->CCR1	//PA6-BIN1
+#define PWMB2   TIM3->CCR4	//PA4-BIN2
 
 
 extern volatile int Encoder_Left,Encoder_Right;		      //编码器左右速度值
