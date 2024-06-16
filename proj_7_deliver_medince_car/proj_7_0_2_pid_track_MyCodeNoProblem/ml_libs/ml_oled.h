@@ -2,15 +2,7 @@
 #define __OLED_H
 #include "headfile.h"
 
-/* 
-   软件模拟I2C协议
-	 修改下面三个参数 
-	 自定义OLED的SCL和SDA引脚
-	 需将对应引脚配置成开漏输出	 
-*/
-#define OLED_GPIO     GPIO_B
-#define OLED_SCL_Pin  Pin_8
-#define OLED_SDA_Pin  Pin_9
+
 
 
 void OLED_Init(void);

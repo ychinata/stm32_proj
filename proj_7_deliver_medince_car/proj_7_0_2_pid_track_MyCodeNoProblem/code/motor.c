@@ -1,5 +1,27 @@
 #include "motor.h"
 
+/*      
+STBY->5V
+
+motorA:
+PWMA->PA0  TIM2_CH1
+AIN1->PA6
+AIN2->PA7
+
+E1A->PA2
+E1B->PA3
+
+motorB:
+PWMB->PA1  TIM2_CH2
+BIN1->PB0
+BIN2->PB1
+
+E2A->PA4
+E2B->PA5
+
+将引脚参数化 放到headfile.h中
+*/
+
 uint8_t motorA_dir = 1; // 1为正转 0为反转
 uint8_t motorB_dir = 1; // 1为正转 0为反转
 

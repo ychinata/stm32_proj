@@ -24,6 +24,9 @@ int main(void)
 	gray_init();
 	
 	tim_interrupt_ms_init(TIM_3,10,0);
+    
+    OLED_ShowString(1,1, "My Code");
+    
 	while (1)
 	{
 //		printf("speedA_now:%d, speedB_now:%d\r\n", (int)motorA.now, (int)motorB.now);
