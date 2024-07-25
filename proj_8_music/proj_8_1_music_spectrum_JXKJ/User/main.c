@@ -4,26 +4,32 @@ void Init(void)
 {
 	RCC_Init();
 	NVIC_GroupConfig();
+
+	Serial_Init();    
+    printf("Init end.\r\n");	
+    Serial_Printf("hello usart:%d\r\n", 444);
+    
 	Key_Init();
-	AT24C02_Init();
+	//AT24C02_Init();
 	Light_Init();
 	Spectrum_Init();
-	DS3231_Init();
-	BrightnessSetInit();
+	//DS3231_Init();
+	//BrightnessSetInit();
 	Display_Init();
 	TIM4_SetIRQHandler(MainLoop);
 	TIM4_Init();
+    printf("Init end2.\r\n");	
 }
 
 int main(void)
 {
 	Init();
-	if(Key_GetKeyNum()==1)
-	{
+	if (Key_GetKeyNum()==1) {
 		SystemTest();
 	}
-	while(1)
-	{
+	while(1) {
+		SpectrumShow();
+	/*
 		KeyNum=Key_GetKeyNumber();
 		switch(Mode)
 		{
@@ -33,8 +39,9 @@ int main(void)
 			case 21:SpectrumAutoSwitch();break;
 			case 30:BrightnessSet();break;
 		}
-		Global();
-		ModeChange();
+		*/
+		//Global();
+		//ModeChange();
 	}
 }
 
@@ -277,7 +284,7 @@ void SpectrumShow(void)
 	}
 	Spectrum_GetValue();
 	Spectrum_Show();
-	Delay_ms(10);
+	Delay_ms(100);
 }
 
 /*自动切换*/

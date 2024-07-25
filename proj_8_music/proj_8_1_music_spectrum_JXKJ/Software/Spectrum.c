@@ -4,6 +4,9 @@
 #include "Display.h"
 #include "AT24C02.h"
 #include "Delay.h"
+#include "Serial.h"
+
+// 江协科技RGB点阵：高32*宽64
 
 uint8_t Spectrum_Type;
 uint8_t Spectrum_Level[64];
@@ -44,7 +47,16 @@ void Spectrum_GetValue(void)
 	{
 		FFT_Input[i]=Sample_Value[i]-2048;
 	}
+
+	// 打印时域数据
+	printf("Show FFT input data:\r\n");
+	for (i=0; i < FFT_NUM; i++) {
+		printf("%f\r\n", FFT_Input[i]/1);
+	}
+
+	
 	FFT();
+	
 	for(i=0;i<64;i++)
 	{
 		Spectrum_Level[i]=FFT_Output[i]/64;

@@ -13,6 +13,8 @@
 #include "Spectrum.h"
 #include "Sample.h"
 #include "AT24C02.h"
+#include "Serial.h"
+#include "OLED.h"
 
 void SystemTest(void);
 void BrightnessSetInit(void);

@@ -1,28 +1,21 @@
 #ifndef __OLED_H
 #define __OLED_H
-#include "stm32f10x.h"
-#include "stdio.h"
 
-/*DisplayTypeå®å®šä¹‰*/
-#define		NORMAL		8
-#define		SMALL		6
-#define		REVERSE		0x10
-
-/*NumTypeå®å®šä¹‰*/
-#define		SIGNED		0x10
-#define		HEX			0x20
-
-/*å¤–éƒ¨å¯è°ƒç”¨å˜é‡å£°æ˜*/
-extern char OLED_String[25];
-
-/*åº”ç”¨å±‚å‡½æ•°*/
 void OLED_Init(void);
-void OLED_AllClear(void);
-void OLED_AreaClear(uint8_t StartX,uint8_t StartY,uint8_t EndX,uint8_t EndY);
-void OLED_ShowChar(uint8_t X,uint8_t Y,int8_t Char,uint8_t DisplayType);
-void OLED_ShowString(uint8_t X,uint8_t Y,char *String,uint8_t DisplayType);
-void OLED_ShowNumber(uint8_t X,uint8_t Y,int32_t Number,uint8_t NumType,uint8_t DisplayType);
-void OLED_ShowChinese(uint8_t X,uint8_t Y,uint8_t *Chinese,uint8_t DisplayType);
-void OLED_ShowImage(uint8_t X,uint8_t Y,uint8_t *Image,uint8_t DisplayType);
+void OLED_Clear(void);
+void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char);
+void OLED_ShowString(uint8_t Line, uint8_t Column, char *String);
+void OLED_ShowNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Length);
+/**
+  * @brief  OLEDÏÔÊ¾Êı×Ö£¨Ê®Áù½øÖÆ£¬ÕıÊı£©
+  * @param  Line ÆğÊ¼ĞĞÎ»ÖÃ£¬·¶Î§£º1~4
+  * @param  Column ÆğÊ¼ÁĞÎ»ÖÃ£¬·¶Î§£º1~16
+  * @param  Number ÒªÏÔÊ¾µÄÊı×Ö£¬·¶Î§£º0~0xFFFFFFFF
+  * @param  Length ÒªÏÔÊ¾Êı×ÖµÄ³¤¶È£¬·¶Î§£º1~8
+  * @retval ÎŞ
+  */
+void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
+void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length);
 
 #endif
