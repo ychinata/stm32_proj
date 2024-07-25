@@ -24,6 +24,8 @@ void Init(void)
 	Display_Init();
 	TIM4_SetIRQHandler(MainLoop);
 	TIM4_Init();
+	OLED_Init();
+	OLED_ShowString(1, 1, "FFT DEMO");
     printf("Init end2.\r\n");	
 }
 
