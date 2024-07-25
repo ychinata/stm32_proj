@@ -46,16 +46,22 @@ void Spectrum_GetValue(void)
 	for(i=0;i<128;i++)
 	{
 		FFT_Input[i]=Sample_Value[i]-2048;
+		// max4466麦克风, out引脚为2.5V, 供电5V		
 	}
 
 	// 打印时域数据
-	printf("Show FFT input data:\r\n");
-	for (i=0; i < FFT_NUM; i++) {
+	printf("Input FFT data:\r\n");
+	for (i=0; i < FFT_Size; i++) {
 		printf("%f\r\n", FFT_Input[i]/1);
 	}
 
 	
 	FFT();
+
+	printf("Output FFT data:\r\n");
+	for (i=0; i < FFT_Size/2; i++) {
+		printf("%f\r\n", FFT_Output[i]/1);
+	}	
 	
 	for(i=0;i<64;i++)
 	{

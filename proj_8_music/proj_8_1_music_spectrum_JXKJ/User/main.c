@@ -1,12 +1,18 @@
 #include "MainHeader.h"
 
+/* 引脚分配：
+
+串口-PA9/10
+
+*/
+
 void Init(void)
 {
 	RCC_Init();
 	NVIC_GroupConfig();
 
 	Serial_Init();    
-    printf("Init end.\r\n");	
+    //printf("Init end.\r\n");	
     Serial_Printf("hello usart:%d\r\n", 444);
     
 	Key_Init();

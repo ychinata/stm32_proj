@@ -1,6 +1,5 @@
 #include "FFT.H"
 
-#define FFT_Size 128			/*输入序列的大小，在本程序中仅限2的次幂*/
 float FFT_Input[FFT_Size];	/*输入序列*/
 float FFT_Output[FFT_Size/2];	/*输出序列*/
 
