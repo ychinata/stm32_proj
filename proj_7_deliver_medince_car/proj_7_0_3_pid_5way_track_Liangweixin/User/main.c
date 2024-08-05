@@ -1,0 +1,56 @@
+#include "stm32f10x.h"                  // Device header
+#include "Delay.h"
+#include "OLED.h"
+#include "LED.h"
+#include "Timer.h"
+#include "Encoder.h"
+#include "motor.h"
+#include "pwm.h"
+#include "pid.h"
+#include "gray_track.h"
+#include "serial.h"
+
+
+int main(void)
+{
+	OLED_Init();                 //OLED初始化
+	Timer_Init(200,7200);        //定时3器中断   设置重装载值和预分频系数 此处溢出时间为20ms 
+	Encoder_Init();              //定时器2、4 编码器初始化
+	PWM_Init(1000,7);            //定时器1  PWM初始化    设置重装载值和预分频系数 此处PWM频率为10.285kHZ 
+	Motor_Init();
+	LED_Init();
+    gray_init();
+    
+    //
+    pid_init(&pid_motor_right,POSITION_PID,3,1.5,0);    //PID初始化
+    pid_init(&pid_motor_left,POSITION_PID,3,1.5,0);
+    Serial_Init();
+//    SysTick_Config(SystemCoreClock / 1000);    /* 初始化SysTick定时器中断 1ms*/
+    OLED_ShowString(1,1,"LeftNum:");        
+    OLED_ShowString(2,1,"RightNum:");
+	while (1)
+	{
+        OLED_ShowSignedNum(1,10,left_count,4);
+        OLED_ShowSignedNum(2,10,right_count,4);
+
+	}
+}
+
+
+
+/* 
+    定时器4中断服务函数 20ms进行一次PID计算
+*/
+void TIM3_IRQHandler(void)
+{
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == SET)
+	{
+        
+         //单位时间20ms 编码器捕获的值
+        right_count = Encoder_Right_Get();     
+        left_count  = -Encoder_Left_Get();    
+        pid_contorl();
+     
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+	}
+}
