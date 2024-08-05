@@ -20,8 +20,6 @@ void Motor_Init(void)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	
-
 }
 
 void Motor_Left_SetSpeed(int16_t Speed)    //×óÂÖPWMÉèÖÃ
@@ -47,7 +45,6 @@ void Motor_Left_Stop(void)  // ×óÂÖÍ£Ö¹
         GPIO_ResetBits(GPIOB, GPIO_Pin_14); 
 		GPIO_ResetBits(GPIOB, GPIO_Pin_15); 
 		PWM_SetCompare1(0);
-
 }
     
 

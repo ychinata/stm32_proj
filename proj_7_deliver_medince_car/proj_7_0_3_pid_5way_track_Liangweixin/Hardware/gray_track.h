@@ -1,14 +1,9 @@
 #ifndef __gray_track_h_
 #define __gray_track_h_
 
-
-
-
-
-
-void gray_init(void);
-void track(void);
-void Read_digital(void);
+void TRACK_Init(void);
+void TRACK_Control(void);
+void TRACK_GetStatus(void);
 unsigned char digtal(unsigned char channel);
 
 #endif

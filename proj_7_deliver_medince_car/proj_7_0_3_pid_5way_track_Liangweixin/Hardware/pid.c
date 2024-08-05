@@ -27,7 +27,7 @@ void pid_init(pid_t *pid,uint8_t mode,float p,float i,float d){
 */
 void pid_contorl(void){
     //1、根据寻迹模块 设置目标值
-    track();
+    TRACK_Control();
     //2、获取当前速度
     pid_motor_left.now = left_count;
     pid_motor_right.now = right_count;
