@@ -24,27 +24,27 @@ void Motor_Init(void)
 
 void Motor_Left_SetSpeed(int16_t Speed)    //◊Û¬÷PWM…Ë÷√
 {
-		PWM_SetCompare1(Speed);
+	PWM_SetCompare1(Speed);
 }
 
 void Motor_Right_SetSpeed(int16_t Speed)  // ”“¬÷PWM…Ë÷√
 {
-		PWM_SetCompare4(Speed);
+	PWM_SetCompare4(Speed);
 }
 
 void Motor_Right_Stop(void)  // ”“¬÷Õ£÷π
 {
-    	GPIO_ResetBits(GPIOB, GPIO_Pin_13);
-		GPIO_ResetBits(GPIOB, GPIO_Pin_12);
-		PWM_SetCompare4(0);
+    GPIO_ResetBits(GPIOB, GPIO_Pin_13);
+	GPIO_ResetBits(GPIOB, GPIO_Pin_12);
+	PWM_SetCompare4(0);
 } 
 
 
 void Motor_Left_Stop(void)  // ◊Û¬÷Õ£÷π
 {
-        GPIO_ResetBits(GPIOB, GPIO_Pin_14); 
-		GPIO_ResetBits(GPIOB, GPIO_Pin_15); 
-		PWM_SetCompare1(0);
+	GPIO_ResetBits(GPIOB, GPIO_Pin_14); 
+	GPIO_ResetBits(GPIOB, GPIO_Pin_15); 
+	PWM_SetCompare1(0);
 }
     
 

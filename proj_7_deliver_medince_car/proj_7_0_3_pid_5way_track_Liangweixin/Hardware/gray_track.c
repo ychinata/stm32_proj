@@ -36,15 +36,15 @@ void TRACK_Init(void)
 void TRACK_Control(void)                        
 {
     TRACK_GetStatus();
-	if(D1==0 && D2== 1 && D3==0){
+	if(D1==0 && D2== 1 && D3==0){			// ¾ÓÖÐ
         motor_target_set(60,60);
-    } else if (D1==1 && D2==1 && D3==0){
+    } else if (D1==1 && D2==1 && D3==0){	// ÓÒÆ«Ð¡
         motor_target_set(45,60);
-    } else if (D1==1 && D2==0 && D3==0){
+    } else if (D1==1 && D2==0 && D3==0){	// ÓÒÆ«´ó	
         motor_target_set(30,60);
-    } else if (D1==0 && D2==1 && D3==1){
+    } else if (D1==0 && D2==1 && D3==1){	// ×óÆ«Ð¡
         motor_target_set(60,45);
-    } else if (D1==0 && D2==0 && D3==1){
+    } else if (D1==0 && D2==0 && D3==1){	// ×óÆ«´ó
         motor_target_set(60,30);
     }    
 }
