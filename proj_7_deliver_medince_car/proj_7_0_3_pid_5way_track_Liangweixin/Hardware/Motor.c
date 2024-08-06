@@ -5,7 +5,7 @@
     TB6612引脚图
     BIN2——>  PB12       IN1 IN2
     BIN1——>  PB13       0    0  停止
-    AIN1——>  PB14       0    1  正传
+    AIN1——>  PB14       0    1  正转
     AIN2——>  PB15       1    0  反转  
     
 */
@@ -48,7 +48,7 @@ void Motor_Left_Stop(void)  // 左轮停止
 }
     
 
-void Motor_Left_Fwd(void)  // 左轮正传
+void Motor_Left_Fwd(void)  // 左轮正转
 {
     GPIO_ResetBits(GPIOB, GPIO_Pin_14);
 	GPIO_SetBits(GPIOB, GPIO_Pin_15);
@@ -61,7 +61,7 @@ void Motor_Left_Rev(void)  // 左轮反转
 }
 
 
-void Motor_Right_Fwd(void)  // 右轮正传
+void Motor_Right_Fwd(void)  // 右轮正转
 {
     GPIO_SetBits(GPIOB, GPIO_Pin_13); 
 	GPIO_ResetBits(GPIOB, GPIO_Pin_12); 

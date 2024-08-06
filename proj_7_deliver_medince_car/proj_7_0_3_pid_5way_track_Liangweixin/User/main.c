@@ -10,6 +10,7 @@
 #include "gray_track.h"
 #include "serial.h"
 
+extern uint8_t D1,D2,D3;
 
 int main(void)
 {
@@ -28,9 +29,14 @@ int main(void)
 //    SysTick_Config(SystemCoreClock / 1000);    /* 初始化SysTick定时器中断 1ms*/
     OLED_ShowString(1,1,"LeftPwm:");         
     OLED_ShowString(2,1,"RightPwm:");
+	OLED_ShowString(3,1,"Track:");
+	
 	while (1) {
         OLED_ShowSignedNum(1,10,left_count,4);
         OLED_ShowSignedNum(2,10,right_count,4);
+		OLED_ShowNum(3,7,D1,1);
+		OLED_ShowNum(3,8,D2,1);
+		OLED_ShowNum(3,9,D3,1);
 	}
 }
 
