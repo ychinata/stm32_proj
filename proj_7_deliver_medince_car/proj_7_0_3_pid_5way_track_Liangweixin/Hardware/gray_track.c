@@ -34,19 +34,19 @@ void TRACK_Init(void)
    1.Rename:track->TRACK_Control 2024.8.5
  */
 
-// 五路红外循迹：白纸亮灯，高电平5V；黑线灭灯，低电平0V
-// 三路巡迹
+// 五路红外循迹：白纸亮灯，高电平5V；黑线灭灯，低电平0V -居中1|0|1
+// 三路红外巡迹：白纸亮灯，低电平0V；黑线灭灯，高电平3V3-居中0|1|0
 void TRACK_Control(void)                        
 {
     TRACK_GetStatus();
 	if(D1==TRACK_OFFLINE && D2== TRACK_INLINE && D3==TRACK_OFFLINE){			// 居中1|0|1
-        motor_target_set(60,60);
+        motor_target_set(50,50);
     } else if (D1==TRACK_INLINE && D2==TRACK_OFFLINE && D3==TRACK_OFFLINE){	// 右偏大	0|11
-        motor_target_set(30,60);
+        motor_target_set(10,60);
     } else if (D1==TRACK_OFFLINE && D2==TRACK_OFFLINE && D3==TRACK_INLINE){	// 左偏大 11|0
-        motor_target_set(60,30);
+        motor_target_set(60,10);
     } else if (D1==TRACK_OFFLINE && D2==TRACK_OFFLINE && D3==TRACK_OFFLINE) { // 没压到线 111   
-        motor_target_set(30,30);												// 偏离，但检测不到是偏哪边，减速
+        motor_target_set(20,20);												// 偏离，但检测不到是偏哪边，减速
 	} else if (D1==TRACK_INLINE && D2==TRACK_INLINE && D3==TRACK_INLINE) { // 离地 000	
 		motor_target_set(0,0);
 	}

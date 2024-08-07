@@ -10,6 +10,7 @@
 #include "gray_track.h"
 #include "serial.h"
 
+//待封装函数
 extern uint8_t D1,D2,D3;
 
 int main(void)
@@ -22,9 +23,9 @@ int main(void)
 	LED_Init();
     TRACK_Init();               // 灰度巡迹
     
-    //
-    pid_init(&pid_motor_right,POSITION_PID,3,1.5,0);    //PID初始化
-    pid_init(&pid_motor_left,POSITION_PID,3,1.5,0);
+    // 
+    pid_init(&pid_motor_right,POSITION_PID,10,1.5,0);    //PID初始化
+    pid_init(&pid_motor_left,POSITION_PID,10,1.5,0);
     Serial_Init();
 //    SysTick_Config(SystemCoreClock / 1000);    /* 初始化SysTick定时器中断 1ms*/
     OLED_ShowString(1,1,"LeftPwm:");         
