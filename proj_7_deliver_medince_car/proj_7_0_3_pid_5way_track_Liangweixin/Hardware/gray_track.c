@@ -1,5 +1,6 @@
 #include "stm32f10x.h"                  // Device header
-#include "gray_track.h"               
+#include "gray_track.h"    
+#include "motor.h"
 #include "pid.h"     
 
 uint8_t D1,D2,D3 = 0;
@@ -25,18 +26,19 @@ void TRACK_Init(void)
  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;               //浮空输入
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Pin = TRACK_PIN_L1 | TRACK_PIN_M | TRACK_PIN_R1;     //三路寻迹
- 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+ 	GPIO_Init(GPIOB, &GPIO_InitStructure);	
 }
 
-/* 
- *Func: 根据寻迹模块检测到的状态，修改pid目标值 
- *History:
-   1.Rename:track->TRACK_Control 2024.8.5
- */
+
 
 // 五路红外循迹：白纸亮灯，高电平5V；黑线灭灯，低电平0V -居中1|0|1
 // 三路红外巡迹：白纸亮灯，低电平0V；黑线灭灯，高电平3V3-居中0|1|0
-void TRACK_Control(void)                        
+/* 
+ *Func: 根据三路寻迹模块检测到的状态，修改pid目标值 
+ *Author: xxy
+ *History:
+ */
+void TRACK_Control3WayWide(void)
 {
     TRACK_GetStatus();
 	if(D1==TRACK_OFFLINE && D2== TRACK_INLINE && D3==TRACK_OFFLINE){			// 居中1|0|1
@@ -52,7 +54,12 @@ void TRACK_Control(void)
 	}
 }
 
-void TRACK_Control5Way(void)                        
+/* 
+ *Func: 根据寻迹模块检测到的状态，修改pid目标值 
+ *History:
+   1.Rename:track->TRACK_Control3WayNarrow 2024.8.5
+ */
+void TRACK_Control3WayNarrow(void)                        
 {
     TRACK_GetStatus();
 	if(D1==TRACK_OFFLINE && D2== TRACK_INLINE && D3==TRACK_OFFLINE){			// 居中1|0|1
@@ -70,6 +77,41 @@ void TRACK_Control5Way(void)
     }
 }
 
+void TRACK_ControlPID(void)
+{
+	if (TRACK_WAY_TYPE == TRACK_WAY3_WIDE) {
+		TRACK_Control3WayWide();
+	} else if (TRACK_WAY_TYPE == TRACK_WAY3_NARROW) {
+		TRACK_Control3WayNarrow();
+	}
+}
+
+/* 
+ *Func: 根据三路寻迹模块检测到的状态进行循迹 
+ *Author: xxy.2024.8.7
+ *History:
+ */
+void TRACK_ControlNoPID(void)
+{
+    TRACK_GetStatus();
+	if(D1==TRACK_OFFLINE && D2== TRACK_INLINE && D3==TRACK_OFFLINE){			// 居中1|0|1
+		Motor_Left_SetSpeed(500);
+		Motor_Right_SetSpeed(500);
+    } else if (D1==TRACK_INLINE && D2==TRACK_OFFLINE && D3==TRACK_OFFLINE){	// 右偏大	0|11
+		Motor_Left_SetSpeed(100);
+		Motor_Right_SetSpeed(600);		
+    } else if (D1==TRACK_OFFLINE && D2==TRACK_OFFLINE && D3==TRACK_INLINE){	// 左偏大 11|0
+		Motor_Left_SetSpeed(600);
+		Motor_Right_SetSpeed(100);		
+    } else if (D1==TRACK_OFFLINE && D2==TRACK_OFFLINE && D3==TRACK_OFFLINE) { // 没压到线 111   
+		Motor_Left_SetSpeed(200);
+		Motor_Right_SetSpeed(200);
+		// 偏离，但检测不到是偏哪边，减速
+	} else if (D1==TRACK_INLINE && D2==TRACK_INLINE && D3==TRACK_INLINE) { // 离地 000	
+		Motor_Left_SetSpeed(0);
+		Motor_Right_SetSpeed(0);		
+	}
+}
 
 /* 
  *Func: 读取寻迹模块引脚的状态（三路循迹）

@@ -10,8 +10,15 @@
 #include "gray_track.h"
 #include "serial.h"
 
+#define CONTROL_MODE_NOPID 0 
+#define CONTROL_MODE_PID 1 
+
 //待封装函数
 extern uint8_t D1,D2,D3;
+
+// 开环/闭环控制
+uint8_t g_ControlMode = CONTROL_MODE_NOPID;
+
 
 int main(void)
 {
@@ -46,11 +53,15 @@ int main(void)
 */
 void TIM3_IRQHandler(void)
 {
-	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == SET) {        
-         //单位时间20ms 编码器捕获的值
-        right_count = Encoder_Right_Get();     
-        left_count  = -Encoder_Left_Get();    
-        pid_contorl();     
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == SET) {          
+		if (g_ControlMode == CONTROL_MODE_NOPID) { // 开环
+			TRACK_ControlNoPID();
+		} else {	// 闭环PID控制
+			 //单位时间20ms 编码器捕获的值
+			right_count = Encoder_Right_Get();	   
+			left_count	= -Encoder_Left_Get();	  
+			pid_contorl();	
+		}		
 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 	}
 }
