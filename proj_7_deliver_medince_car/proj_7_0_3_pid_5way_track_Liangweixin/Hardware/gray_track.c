@@ -42,13 +42,13 @@ void TRACK_Control3WayWide(void)
 {
     TRACK_GetStatus();
 	if(D1==TRACK_OFFLINE && D2== TRACK_INLINE && D3==TRACK_OFFLINE){			// 居中1|0|1
-        motor_target_set(50,50);
+        motor_target_set(60,60);
     } else if (D1==TRACK_INLINE && D2==TRACK_OFFLINE && D3==TRACK_OFFLINE){	// 右偏大	0|11
-        motor_target_set(10,60);
+        motor_target_set(20,120);
     } else if (D1==TRACK_OFFLINE && D2==TRACK_OFFLINE && D3==TRACK_INLINE){	// 左偏大 11|0
-        motor_target_set(60,10);
+        motor_target_set(120,20);
     } else if (D1==TRACK_OFFLINE && D2==TRACK_OFFLINE && D3==TRACK_OFFLINE) { // 没压到线 111   
-        motor_target_set(20,20);												// 偏离，但检测不到是偏哪边，减速
+        motor_target_set(40,40);												// 偏离，但检测不到是偏哪边，减速
 	} else if (D1==TRACK_INLINE && D2==TRACK_INLINE && D3==TRACK_INLINE) { // 离地 000	
 		motor_target_set(0,0);
 	}

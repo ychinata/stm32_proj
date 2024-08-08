@@ -17,7 +17,7 @@
 extern uint8_t D1,D2,D3;
 
 // 开环/闭环控制
-uint8_t g_ControlMode = CONTROL_MODE_NOPID;
+uint8_t g_ControlMode = CONTROL_MODE_PID;
 
 
 int main(void)
@@ -31,8 +31,8 @@ int main(void)
     TRACK_Init();               // 灰度巡迹
     
     // 
-    pid_init(&pid_motor_right,POSITION_PID,10,1.5,0);    //PID初始化
-    pid_init(&pid_motor_left,POSITION_PID,10,1.5,0);
+    pid_init(&pid_motor_right,POSITION_PID,20,1.5,0);    //PID初始化
+    pid_init(&pid_motor_left,POSITION_PID,20,1.5,0);
     Serial_Init();
 //    SysTick_Config(SystemCoreClock / 1000);    /* 初始化SysTick定时器中断 1ms*/
     OLED_ShowString(1,1,"LeftPwm:");         
